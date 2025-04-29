@@ -1,0 +1,1897 @@
+{
+    "info": {
+      "_postman_id": "f8a91b5e-3a1d-4e54-9eff-d2a786d2d1f0",
+      "name": "Rahati Healthcare Platform API (localhost)",
+      "description": "API collection for the Rahati Healthcare Platform running on localhost:8000",
+      "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [
+      {
+        "name": "Authentication",
+        "description": "Authentication endpoints using Laravel Sanctum",
+        "item": [
+          {
+            "name": "Login",
+            "request": {
+              "method": "POST",
+              "header": [
+                {
+                  "key": "Accept",
+                  "value": "application/json"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n    \"email\": \"user@example.com\",\n    \"password\": \"password\"\n}"
+              },
+              "url": {
+                "raw": "{{base_url}}/auth/login",
+                "host": ["{{base_url}}"],
+                "path": ["auth", "login"]
+              },
+              "description": "Authenticate user and receive access token"
+            },
+            "response": [
+              {
+                "name": "Success Response",
+                "originalRequest": {
+                  "method": "POST",
+                  "body": {
+                    "mode": "raw",
+                    "raw": "{\n    \"email\": \"user@example.com\",\n    \"password\": \"password\"\n}"
+                  }
+                },
+                "status": "OK",
+                "code": 200,
+                "_postman_previewlanguage": "json",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": "{\n    \"token\": \"your-auth-token\",\n    \"userId\": 1,\n    \"role\": \"Patient\"\n}"
+              }
+            ]
+          },
+          {
+            "name": "Register",
+            "request": {
+              "method": "POST",
+              "header": [
+                {
+                  "key": "Accept",
+                  "value": "application/json"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n    \"name\": \"John Doe\",\n    \"email\": \"user@example.com\",\n    \"password\": \"password\",\n    \"password_confirmation\": \"password\",\n    \"role\": \"Patient\",\n    \"phone\": \"555-1234\",\n    \"address\": \"123 Main St\"\n}"
+              },
+              "url": {
+                "raw": "{{base_url}}/auth/register",
+                "host": ["{{base_url}}"],
+                "path": ["auth", "register"]
+              },
+              "description": "Register a new user account"
+            }
+          },
+          {
+            "name": "Logout",
+            "request": {
+              "method": "POST",
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{token}}"
+                },
+                {
+                  "key": "Accept",
+                  "value": "application/json"
+                }
+              ],
+              "url": {
+                "raw": "{{base_url}}/auth/logout",
+                "host": ["{{base_url}}"],
+                "path": ["auth", "logout"]
+              },
+              "description": "Invalidate the current access token"
+            }
+          },
+          {
+            "name": "Get Current User",
+            "request": {
+              "method": "GET",
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{token}}"
+                },
+                {
+                  "key": "Accept",
+                  "value": "application/json"
+                }
+              ],
+              "url": {
+                "raw": "{{base_url}}/auth/user",
+                "host": ["{{base_url}}"],
+                "path": ["auth", "user"]
+              },
+              "description": "Get the currently authenticated user's details"
+            }
+          }
+        ]
+      },
+      {
+        "name": "Users",
+        "description": "User management endpoints",
+        "item": [
+          {
+            "name": "List Users",
+            "request": {
+              "method": "GET",
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{token}}"
+                },
+                {
+                  "key": "Accept",
+                  "value": "application/json"
+                }
+              ],
+              "url": {
+                "raw": "{{base_url}}/users?role=Patient&page=1&per_page=10",
+                "host": ["{{base_url}}"],
+                "path": ["users"],
+                "query": [
+                  {
+                    "key": "role",
+                    "value": "Patient",
+                    "description": "Filter by user role"
+                  },
+                  {
+                    "key": "page",
+                    "value": "1",
+                    "description": "Page number"
+                  },
+                  {
+                    "key": "per_page",
+                    "value": "10",
+                    "description": "Items per page"
+                  }
+                ]
+              },
+              "description": "Get paginated list of users (Admin only)"
+            }
+          },
+          {
+            "name": "Get User Profile",
+            "request": {
+              "method": "GET",
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{token}}"
+                },
+                {
+                  "key": "Accept",
+                  "value": "application/json"
+                }
+              ],
+              "url": {
+                "raw": "{{base_url}}/users/{{user_id}}",
+                "host": ["{{base_url}}"],
+                "path": ["users", "{{user_id}}"]
+              },
+              "description": "Get user profile details"
+            }
+          },
+          {
+            "name": "Create User",
+            "request": {
+              "method": "POST",
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{token}}"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "Accept",
+                  "value": "application/json"
+                }
+              ],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n    \"name\": \"Jane Smith\",\n    \"email\": \"jane@example.com\",\n    \"password\": \"password\",\n    \"role\": \"Provider\",\n    \"phone\": \"555-5678\",\n    \"address\": \"456 Oak St\"\n}"
+              },
+              "url": {
+                "raw": "{{base_url}}/users",
+                "host": ["{{base_url}}"],
+                "path": ["users"]
+              },
+              "description": "Create a new user (Admin only)"
+            }
+          },
+          {
+            "name": "Update User",
+            "request": {
+              "method": "PUT",
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{token}}"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "Accept",
+                  "value": "application/json"
+                }
+              ],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n    \"name\": \"Jane Smith Updated\",\n    \"phone\": \"555-9876\",\n    \"address\": \"789 Pine St\",\n    \"caregiver_name\": \"Bob Smith\",\n    \"caregiver_phone\": \"555-4321\"\n}"
+              },
+              "url": {
+                "raw": "{{base_url}}/users/{{user_id}}",
+                "host": ["{{base_url}}"],
+                "path": ["users", "{{user_id}}"]
+              },
+              "description": "Update user profile details"
+            }
+          },
+          {
+            "name": "Delete User",
+            "request": {
+              "method": "DELETE",
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{token}}"
+                },
+                {
+                  "key": "Accept",
+                  "value": "application/json"
+                }
+              ],
+              "url": {
+                "raw": "{{base_url}}/users/{{user_id}}",
+                "host": ["{{base_url}}"],
+                "path": ["users", "{{user_id}}"]
+              },
+              "description": "Delete a user (Admin only)"
+            }
+          }
+        ]
+      },
+      {
+        "name": "Centers",
+        "description": "Healthcare center management endpoints",
+        "item": [
+          {
+            "name": "List Centers",
+            "request": {
+              "method": "GET",
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{token}}"
+                },
+                {
+                  "key": "Accept",
+                  "value": "application/json"
+                }
+              ],
+              "url": {
+                "raw": "{{base_url}}/centers?is_active=true",
+                "host": ["{{base_url}}"],
+                "path": ["centers"],
+                "query": [
+                  {
+                    "key": "is_active",
+                    "value": "true",
+                    "description": "Filter by active status"
+                  }
+                ]
+              },
+              "description": "Get list of healthcare centers"
+            }
+          },
+          {
+            "name": "Get Center Details",
+            "request": {
+              "method": "GET",
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{token}}"
+                },
+                {
+                  "key": "Accept",
+                  "value": "application/json"
+                }
+              ],
+              "url": {
+                "raw": "{{base_url}}/centers/1",
+                "host": ["{{base_url}}"],
+                "path": ["centers", "1"]
+              },
+              "description": "Get details for a specific healthcare center"
+            }
+          },
+          {
+            "name": "Create Center",
+            "request": {
+              "method": "POST",
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{token}}"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "Accept",
+                  "value": "application/json"
+                }
+              ],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n    \"name\": \"Rahati Medical Center\",\n    \"description\": \"A state-of-the-art healthcare facility\",\n    \"address\": \"123 Health St, Medical District\",\n    \"phone\": \"555-HEALTH\",\n    \"email\": \"info@rahatimedical.com\",\n    \"website\": \"https://rahatimedical.com\",\n    \"latitude\": 37.7749,\n    \"longitude\": -122.4194,\n    \"is_active\": true\n}"
+              },
+              "url": {
+                "raw": "{{base_url}}/centers",
+                "host": ["{{base_url}}"],
+                "path": ["centers"]
+              },
+              "description": "Create a new healthcare center (Admin only)"
+            }
+          },
+          {
+            "name": "Update Center",
+            "request": {
+              "method": "PUT",
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{token}}"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "Accept",
+                  "value": "application/json"
+                }
+              ],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n    \"name\": \"Rahati Medical Center Updated\",\n    \"phone\": \"555-RAHATI\",\n    \"email\": \"contact@rahatimedical.com\",\n    \"is_active\": true\n}"
+              },
+              "url": {
+                "raw": "{{base_url}}/centers/1",
+                "host": ["{{base_url}}"],
+                "path": ["centers", "1"]
+              },
+              "description": "Update a healthcare center (Admin only)"
+            }
+          },
+          {
+            "name": "Delete Center",
+            "request": {
+              "method": "DELETE",
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{token}}"
+                },
+                {
+                  "key": "Accept",
+                  "value": "application/json"
+                }
+              ],
+              "url": {
+                "raw": "{{base_url}}/centers/1",
+                "host": ["{{base_url}}"],
+                "path": ["centers", "1"]
+              },
+              "description": "Delete a healthcare center (Admin only)"
+            }
+          }
+        ]
+      },
+      {
+        "name": "Appointments",
+        "description": "Appointment scheduling and management",
+        "item": [
+          {
+            "name": "List Appointments",
+            "request": {
+              "method": "GET",
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{token}}"
+                },
+                {
+                  "key": "Accept",
+                  "value": "application/json"
+                }
+              ],
+              "url": {
+                "raw": "{{base_url}}/appointments?status=scheduled&date_from=2024-05-01&date_to=2024-05-31",
+                "host": ["{{base_url}}"],
+                "path": ["appointments"],
+                "query": [
+                  {
+                    "key": "status",
+                    "value": "scheduled",
+                    "description": "Filter by appointment status"
+                  },
+                  {
+                    "key": "date_from",
+                    "value": "2024-05-01",
+                    "description": "Filter by start date"
+                  },
+                  {
+                    "key": "date_to",
+                    "value": "2024-05-31",
+                    "description": "Filter by end date"
+                  }
+                ]
+              },
+              "description": "Get list of appointments (filtered by user role)"
+            }
+          },
+          {
+            "name": "Get Appointment Details",
+            "request": {
+              "method": "GET",
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{token}}"
+                },
+                {
+                  "key": "Accept",
+                  "value": "application/json"
+                }
+              ],
+              "url": {
+                "raw": "{{base_url}}/appointments/1",
+                "host": ["{{base_url}}"],
+                "path": ["appointments", "1"]
+              },
+              "description": "Get details for a specific appointment"
+            }
+          },
+          {
+            "name": "Create Appointment",
+            "request": {
+              "method": "POST",
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{token}}"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "Accept",
+                  "value": "application/json"
+                }
+              ],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n    \"patient_id\": 1,\n    \"center_id\": 1,\n    \"provider_id\": 2,\n    \"appointment_datetime\": \"2024-05-15T10:00:00Z\",\n    \"appointment_duration\": 60,\n    \"status\": \"scheduled\",\n    \"notes\": \"Initial consultation\"\n}"
+              },
+              "url": {
+                "raw": "{{base_url}}/appointments",
+                "host": ["{{base_url}}"],
+                "path": ["appointments"]
+              },
+              "description": "Create a new appointment"
+            }
+          },
+          {
+            "name": "Update Appointment",
+            "request": {
+              "method": "PUT",
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{token}}"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "Accept",
+                  "value": "application/json"
+                }
+              ],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n    \"appointment_datetime\": \"2024-05-16T14:00:00Z\",\n    \"status\": \"rescheduled\",\n    \"notes\": \"Rescheduled at patient's request\"\n}"
+              },
+              "url": {
+                "raw": "{{base_url}}/appointments/1",
+                "host": ["{{base_url}}"],
+                "path": ["appointments", "1"]
+              },
+              "description": "Update an appointment"
+            }
+          },
+          {
+            "name": "Cancel Appointment",
+            "request": {
+              "method": "DELETE",
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{token}}"
+                },
+                {
+                  "key": "Accept",
+                  "value": "application/json"
+                }
+              ],
+              "url": {
+                "raw": "{{base_url}}/appointments/1",
+                "host": ["{{base_url}}"],
+                "path": ["appointments", "1"]
+              },
+              "description": "Cancel an appointment"
+            }
+          }
+        ]
+      },
+      {
+        "name": "Consultations",
+        "description": "Medical consultation management",
+        "item": [
+          {
+            "name": "List Consultations",
+            "request": {
+              "method": "GET",
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{token}}"
+                },
+                {
+                  "key": "Accept",
+                  "value": "application/json"
+                }
+              ],
+              "url": {
+                "raw": "{{base_url}}/consultations?status=active&provider_id=2",
+                "host": ["{{base_url}}"],
+                "path": ["consultations"],
+                "query": [
+                  {
+                    "key": "status",
+                    "value": "active",
+                    "description": "Filter by status"
+                  },
+                  {
+                    "key": "provider_id",
+                    "value": "2",
+                    "description": "Filter by provider"
+                  }
+                ]
+              },
+              "description": "Get list of consultations"
+            }
+          },
+          {
+            "name": "Get Consultation Details",
+            "request": {
+              "method": "GET",
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{token}}"
+                },
+                {
+                  "key": "Accept",
+                  "value": "application/json"
+                }
+              ],
+              "url": {
+                "raw": "{{base_url}}/consultations/1",
+                "host": ["{{base_url}}"],
+                "path": ["consultations", "1"]
+              },
+              "description": "Get details for a specific consultation"
+            }
+          },
+          {
+            "name": "Start Consultation",
+            "request": {
+              "method": "POST",
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{token}}"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "Accept",
+                  "value": "application/json"
+                }
+              ],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n    \"appointment_id\": 1,\n    \"start_time\": \"2024-05-15T10:00:00Z\",\n    \"status\": \"active\",\n    \"notes\": \"Initial consultation started\"\n}"
+              },
+              "url": {
+                "raw": "{{base_url}}/consultations",
+                "host": ["{{base_url}}"],
+                "path": ["consultations"]
+              },
+              "description": "Start a new consultation"
+            }
+          },
+          {
+            "name": "Complete Consultation",
+            "request": {
+              "method": "PUT",
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{token}}"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "Accept",
+                  "value": "application/json"
+                }
+              ],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n    \"end_time\": \"2024-05-15T11:00:00Z\",\n    \"status\": \"completed\",\n    \"diagnosis\": \"Patient diagnosed with...\",\n    \"treatment_plan\": \"Recommended treatment includes...\",\n    \"follow_up_required\": true,\n    \"follow_up_date\": \"2024-06-15\",\n    \"notes\": \"Consultation completed successfully\"\n}"
+              },
+              "url": {
+                "raw": "{{base_url}}/consultations/1",
+                "host": ["{{base_url}}"],
+                "path": ["consultations", "1"]
+              },
+              "description": "Complete an ongoing consultation"
+            }
+          },
+          {
+            "name": "Cancel Consultation",
+            "request": {
+              "method": "DELETE",
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{token}}"
+                },
+                {
+                  "key": "Accept",
+                  "value": "application/json"
+                }
+              ],
+              "url": {
+                "raw": "{{base_url}}/consultations/1",
+                "host": ["{{base_url}}"],
+                "path": ["consultations", "1"]
+              },
+              "description": "Cancel a consultation"
+            }
+          }
+        ]
+      },
+      {
+        "name": "Accommodations",
+        "description": "Patient accommodation management",
+        "item": [
+          {
+            "name": "List Accommodations",
+            "request": {
+              "method": "GET",
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{token}}"
+                },
+                {
+                  "key": "Accept",
+                  "value": "application/json"
+                }
+              ],
+              "url": {
+                "raw": "{{base_url}}/accommodations?status=confirmed&date_from=2024-05-01&date_to=2024-05-31",
+                "host": ["{{base_url}}"],
+                "path": ["accommodations"],
+                "query": [
+                  {
+                    "key": "status",
+                    "value": "confirmed",
+                    "description": "Filter by status"
+                  },
+                  {
+                    "key": "date_from",
+                    "value": "2024-05-01",
+                    "description": "Filter by check-in date"
+                  },
+                  {
+                    "key": "date_to",
+                    "value": "2024-05-31",
+                    "description": "Filter by check-out date"
+                  }
+                ]
+              },
+              "description": "Get list of accommodations (filtered by user role)"
+            }
+          },
+          {
+            "name": "Get Accommodation Details",
+            "request": {
+              "method": "GET",
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{token}}"
+                },
+                {
+                  "key": "Accept",
+                  "value": "application/json"
+                }
+              ],
+              "url": {
+                "raw": "{{base_url}}/accommodations/1",
+                "host": ["{{base_url}}"],
+                "path": ["accommodations", "1"]
+              },
+              "description": "Get details for a specific accommodation"
+            }
+          },
+          {
+            "name": "Book Accommodation",
+            "request": {
+              "method": "POST",
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{token}}"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "Accept",
+                  "value": "application/json"
+                }
+              ],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n    \"appointment_id\": 1,\n    \"room_id\": 1,\n    \"meal_option_id\": 2,\n    \"check_in_date\": \"2024-05-14\",\n    \"check_out_date\": \"2024-05-16\",\n    \"number_of_guests\": 2,\n    \"special_requests\": \"Ground floor room preferred\"\n}"
+              },
+              "url": {
+                "raw": "{{base_url}}/accommodations",
+                "host": ["{{base_url}}"],
+                "path": ["accommodations"]
+              },
+              "description": "Book a new accommodation"
+            }
+          },
+          {
+            "name": "Update Accommodation",
+            "request": {
+              "method": "PUT",
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{token}}"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "Accept",
+                  "value": "application/json"
+                }
+              ],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n    \"check_out_date\": \"2024-05-17\",\n    \"meal_option_id\": 3,\n    \"status\": \"modified\",\n    \"special_requests\": \"Need extra pillows\"\n}"
+              },
+              "url": {
+                "raw": "{{base_url}}/accommodations/1",
+                "host": ["{{base_url}}"],
+                "path": ["accommodations", "1"]
+              },
+              "description": "Update an accommodation booking"
+            }
+          },
+          {
+            "name": "Cancel Accommodation",
+            "request": {
+              "method": "DELETE",
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{token}}"
+                },
+                {
+                  "key": "Accept",
+                  "value": "application/json"
+                }
+              ],
+              "url": {
+                "raw": "{{base_url}}/accommodations/1",
+                "host": ["{{base_url}}"],
+                "path": ["accommodations", "1"]
+              },
+              "description": "Cancel an accommodation booking"
+            }
+          }
+        ]
+      },
+      {
+        "name": "Rooms",
+        "description": "Room management for accommodations",
+        "item": [
+          {
+            "name": "List Rooms",
+            "request": {
+              "method": "GET",
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{token}}"
+                },
+                {
+                  "key": "Accept",
+                  "value": "application/json"
+                }
+              ],
+              "url": {
+                "raw": "{{base_url}}/rooms?center_id=1&is_available=true&is_accessible=true",
+                "host": ["{{base_url}}"],
+                "path": ["rooms"],
+                "query": [
+                  {
+                    "key": "center_id",
+                    "value": "1",
+                    "description": "Filter by center"
+                  },
+                  {
+                    "key": "is_available",
+                    "value": "true",
+                    "description": "Filter by availability"
+                  },
+                  {
+                    "key": "is_accessible",
+                    "value": "true",
+                    "description": "Filter by accessibility"
+                  }
+                ]
+              },
+              "description": "Get list of rooms"
+            }
+          },
+          {
+            "name": "Get Room Details",
+            "request": {
+              "method": "GET",
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{token}}"
+                },
+                {
+                  "key": "Accept",
+                  "value": "application/json"
+                }
+              ],
+              "url": {
+                "raw": "{{base_url}}/rooms/1",
+                "host": ["{{base_url}}"],
+                "path": ["rooms", "1"]
+              },
+              "description": "Get details for a specific room"
+            }
+          },
+          {
+            "name": "Create Room",
+            "request": {
+              "method": "POST",
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{token}}"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "Accept",
+                  "value": "application/json"
+                }
+              ],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n    \"center_id\": 1,\n    \"room_number\": \"101\",\n    \"type\": \"standard\",\n    \"description\": \"Standard room with two beds\",\n    \"price_per_night\": 100.00,\n    \"capacity\": 2,\n    \"is_accessible\": true,\n    \"is_available\": true\n}"
+              },
+              "url": {
+                "raw": "{{base_url}}/rooms",
+                "host": ["{{base_url}}"],
+                "path": ["rooms"]
+              },
+              "description": "Create a new room (Admin only)"
+            }
+          },
+          {
+            "name": "Update Room",
+            "request": {
+              "method": "PUT",
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{token}}"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "Accept",
+                  "value": "application/json"
+                }
+              ],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n    \"description\": \"Updated room description\",\n    \"price_per_night\": 120.00,\n    \"is_available\": false\n}"
+              },
+              "url": {
+                "raw": "{{base_url}}/rooms/1",
+                "host": ["{{base_url}}"],
+                "path": ["rooms", "1"]
+              },
+              "description": "Update a room (Admin only)"
+            }
+          },
+          {
+            "name": "Delete Room",
+            "request": {
+              "method": "DELETE",
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{token}}"
+                },
+                {
+                  "key": "Accept",
+                  "value": "application/json"
+                }
+              ],
+              "url": {
+                "raw": "{{base_url}}/rooms/1",
+                "host": ["{{base_url}}"],
+                "path": ["rooms", "1"]
+              },
+              "description": "Delete a room (Admin only)"
+            }
+          }
+        ]
+      },
+      {
+        "name": "Meal Options",
+        "description": "Meal options for accommodations",
+        "item": [
+          {
+            "name": "List Meal Options",
+            "request": {
+              "method": "GET",
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{token}}"
+                },
+                {
+                  "key": "Accept",
+                  "value": "application/json"
+                }
+              ],
+              "url": {
+                "raw": "{{base_url}}/meal-options?is_active=true&is_vegetarian=true",
+                "host": ["{{base_url}}"],
+                "path": ["meal-options"],
+                "query": [
+                  {
+                    "key": "is_active",
+                    "value": "true",
+                    "description": "Filter by active status"
+                  },
+                  {
+                    "key": "is_vegetarian",
+                    "value": "true",
+                    "description": "Filter by vegetarian options"
+                  }
+                ]
+              },
+              "description": "Get list of meal options"
+            }
+          },
+          {
+            "name": "Get Meal Option Details",
+            "request": {
+              "method": "GET",
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{token}}"
+                },
+                {
+                  "key": "Accept",
+                  "value": "application/json"
+                }
+              ],
+              "url": {
+                "raw": "{{base_url}}/meal-options/1",
+                "host": ["{{base_url}}"],
+                "path": ["meal-options", "1"]
+              },
+              "description": "Get details for a specific meal option"
+            }
+          },
+          {
+            "name": "Create Meal Option",
+            "request": {
+              "method": "POST",
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{token}}"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "Accept",
+                  "value": "application/json"
+                }
+              ],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n    \"name\": \"Vegetarian Breakfast\",\n    \"description\": \"Healthy vegetarian breakfast option\",\n    \"price\": 15.00,\n    \"is_vegetarian\": true,\n    \"is_vegan\": false,\n    \"is_gluten_free\": true,\n    \"is_active\": true\n}"
+              },
+              "url": {
+                "raw": "{{base_url}}/meal-options",
+                "host": ["{{base_url}}"],
+                "path": ["meal-options"]
+              },
+              "description": "Create a new meal option (Admin only)"
+            }
+          },
+          {
+            "name": "Update Meal Option",
+            "request": {
+              "method": "PUT",
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{token}}"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "Accept",
+                  "value": "application/json"
+                }
+              ],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n    \"description\": \"Updated meal description\",\n    \"price\": 18.50,\n    \"is_active\": true\n}"
+              },
+              "url": {
+                "raw": "{{base_url}}/meal-options/1",
+                "host": ["{{base_url}}"],
+                "path": ["meal-options", "1"]
+              },
+              "description": "Update a meal option (Admin only)"
+            }
+          },
+          {
+            "name": "Delete Meal Option",
+            "request": {
+              "method": "DELETE",
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{token}}"
+                },
+                {
+                  "key": "Accept",
+                  "value": "application/json"
+                }
+              ],
+              "url": {
+                "raw": "{{base_url}}/meal-options/1",
+                "host": ["{{base_url}}"],
+                "path": ["meal-options", "1"]
+              },
+              "description": "Delete a meal option (Admin only)"
+            }
+          }
+        ]
+      },
+      {
+        "name": "Transportation Requests",
+        "description": "Transportation service management",
+        "item": [
+          {
+            "name": "List Transportation Requests",
+            "request": {
+              "method": "GET",
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{token}}"
+                },
+                {
+                  "key": "Accept",
+                  "value": "application/json"
+                }
+              ],
+              "url": {
+                "raw": "{{base_url}}/transportation-requests?status=pending&appointment_id=1",
+                "host": ["{{base_url}}"],
+                "path": ["transportation-requests"],
+                "query": [
+                  {
+                    "key": "status",
+                    "value": "pending",
+                    "description": "Filter by status"
+                  },
+                  {
+                    "key": "appointment_id",
+                    "value": "1",
+                    "description": "Filter by appointment"
+                  }
+                ]
+              },
+              "description": "Get list of transportation requests (filtered by user role)"
+            }
+          },
+          {
+            "name": "Get Transportation Request Details",
+            "request": {
+              "method": "GET",
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{token}}"
+                },
+                {
+                  "key": "Accept",
+                  "value": "application/json"
+                }
+              ],
+              "url": {
+                "raw": "{{base_url}}/transportation-requests/1",
+                "host": ["{{base_url}}"],
+                "path": ["transportation-requests", "1"]
+              },
+              "description": "Get details for a specific transportation request"
+            }
+          },
+          {
+            "name": "Create Transportation Request",
+            "request": {
+              "method": "POST",
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{token}}"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "Accept",
+                  "value": "application/json"
+                }
+              ],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n    \"appointment_id\": 1,\n    \"pickup_location\": \"Airport Terminal 1\",\n    \"dropoff_location\": \"Rahati Medical Center\",\n    \"pickup_time\": \"2024-05-14T14:00:00Z\",\n    \"vehicle_type\": \"sedan\",\n    \"passenger_count\": 2,\n    \"special_requirements\": \"wheelchair_accessible\"\n}"
+              },
+              "url": {
+                "raw": "{{base_url}}/transportation-requests",
+                "host": ["{{base_url}}"],
+                "path": ["transportation-requests"]
+              },
+              "description": "Create a new transportation request"
+            }
+          },
+          {
+            "name": "Update Transportation Request",
+            "request": {
+              "method": "PUT",
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{token}}"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "Accept",
+                  "value": "application/json"
+                }
+              ],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n    \"pickup_time\": \"2024-05-14T15:30:00Z\",\n    \"status\": \"modified\",\n    \"passenger_count\": 3,\n    \"special_requirements\": \"extra_luggage\"\n}"
+              },
+              "url": {
+                "raw": "{{base_url}}/transportation-requests/1",
+                "host": ["{{base_url}}"],
+                "path": ["transportation-requests", "1"]
+              },
+              "description": "Update a transportation request"
+            }
+          },
+          {
+            "name": "Cancel Transportation Request",
+            "request": {
+              "method": "DELETE",
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{token}}"
+                },
+                {
+                  "key": "Accept",
+                  "value": "application/json"
+                }
+              ],
+              "url": {
+                "raw": "{{base_url}}/transportation-requests/1",
+                "host": ["{{base_url}}"],
+                "path": ["transportation-requests", "1"]
+              },
+              "description": "Cancel a transportation request"
+            }
+          }
+        ]
+      },
+      {
+        "name": "Payments",
+        "description": "Payment processing and management",
+        "item": [
+          {
+            "name": "List Payments",
+            "request": {
+              "method": "GET",
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{token}}"
+                },
+                {
+                  "key": "Accept",
+                  "value": "application/json"
+                }
+              ],
+              "url": {
+                "raw": "{{base_url}}/payments?status=completed&appointment_id=1",
+                "host": ["{{base_url}}"],
+                "path": ["payments"],
+                "query": [
+                  {
+                    "key": "status",
+                    "value": "completed",
+                    "description": "Filter by payment status"
+                  },
+                  {
+                    "key": "appointment_id",
+                    "value": "1",
+                    "description": "Filter by appointment"
+                  }
+                ]
+              },
+              "description": "Get list of payments (filtered by user role)"
+            }
+          },
+          {
+            "name": "Get Payment Details",
+            "request": {
+              "method": "GET",
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{token}}"
+                },
+                {
+                  "key": "Accept",
+                  "value": "application/json"
+                }
+              ],
+              "url": {
+                "raw": "{{base_url}}/payments/1",
+                "host": ["{{base_url}}"],
+                "path": ["payments", "1"]
+              },
+              "description": "Get details for a specific payment"
+            }
+          },
+          {
+            "name": "Process Payment",
+            "request": {
+              "method": "POST",
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{token}}"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "Accept",
+                  "value": "application/json"
+                }
+              ],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n    \"appointment_id\": 1,\n    \"amount\": 250.00,\n    \"payment_method\": \"credit_card\",\n    \"payment_date\": \"2024-05-10T09:30:00Z\",\n    \"notes\": \"Payment for initial consultation\"\n}"
+              },
+              "url": {
+                "raw": "{{base_url}}/payments",
+                "host": ["{{base_url}}"],
+                "path": ["payments"]
+              },
+              "description": "Process a new payment"
+            }
+          },
+          {
+            "name": "Update Payment",
+            "request": {
+              "method": "PUT",
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{token}}"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "Accept",
+                  "value": "application/json"
+                }
+              ],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n    \"status\": \"refunded\",\n    \"notes\": \"Payment refunded due to cancellation\"\n}"
+              },
+              "url": {
+                "raw": "{{base_url}}/payments/1",
+                "host": ["{{base_url}}"],
+                "path": ["payments", "1"]
+              },
+              "description": "Update a payment (Admin only)"
+            }
+          },
+          {
+            "name": "Delete Payment",
+            "request": {
+              "method": "DELETE",
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{token}}"
+                },
+                {
+                  "key": "Accept",
+                  "value": "application/json"
+                }
+              ],
+              "url": {
+                "raw": "{{base_url}}/payments/1",
+                "host": ["{{base_url}}"],
+                "path": ["payments", "1"]
+              },
+              "description": "Delete a payment record (Admin only)"
+            }
+          }
+        ]
+      },
+      {
+        "name": "Feedback",
+        "description": "Patient feedback management",
+        "item": [
+          {
+            "name": "List Feedback",
+            "request": {
+              "method": "GET",
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{token}}"
+                },
+                {
+                  "key": "Accept",
+                  "value": "application/json"
+                }
+              ],
+              "url": {
+                "raw": "{{base_url}}/feedback?appointment_id=1",
+                "host": ["{{base_url}}"],
+                "path": ["feedback"],
+                "query": [
+                  {
+                    "key": "appointment_id",
+                    "value": "1",
+                    "description": "Filter by appointment"
+                  }
+                ]
+              },
+              "description": "Get list of feedback (filtered by user role)"
+            }
+          },
+          {
+            "name": "Get Feedback Details",
+            "request": {
+              "method": "GET",
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{token}}"
+                },
+                {
+                  "key": "Accept",
+                  "value": "application/json"
+                }
+              ],
+              "url": {
+                "raw": "{{base_url}}/feedback/1",
+                "host": ["{{base_url}}"],
+                "path": ["feedback", "1"]
+              },
+              "description": "Get details for specific feedback"
+            }
+          },
+          {
+            "name": "Submit Feedback",
+            "request": {
+              "method": "POST",
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{token}}"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "Accept",
+                  "value": "application/json"
+                }
+              ],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n    \"appointment_id\": 1,\n    \"rating\": 5,\n    \"comment\": \"Excellent service\",\n    \"category\": \"medical_care\",\n    \"provider_rating\": 5,\n    \"facility_rating\": 4,\n    \"recommendation_likelihood\": \"very_likely\"\n}"
+              },
+              "url": {
+                "raw": "{{base_url}}/feedback",
+                "host": ["{{base_url}}"],
+                "path": ["feedback"]
+              },
+              "description": "Submit patient feedback"
+            }
+          },
+          {
+            "name": "Update Feedback",
+            "request": {
+              "method": "PUT",
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{token}}"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "Accept",
+                  "value": "application/json"
+                }
+              ],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n    \"rating\": 4,\n    \"comment\": \"Updated feedback comment\",\n    \"facility_rating\": 3\n}"
+              },
+              "url": {
+                "raw": "{{base_url}}/feedback/1",
+                "host": ["{{base_url}}"],
+                "path": ["feedback", "1"]
+              },
+              "description": "Update submitted feedback"
+            }
+          },
+          {
+            "name": "Delete Feedback",
+            "request": {
+              "method": "DELETE",
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{token}}"
+                },
+                {
+                  "key": "Accept",
+                  "value": "application/json"
+                }
+              ],
+              "url": {
+                "raw": "{{base_url}}/feedback/1",
+                "host": ["{{base_url}}"],
+                "path": ["feedback", "1"]
+              },
+              "description": "Delete feedback"
+            }
+          }
+        ]
+      },
+      {
+        "name": "Notifications",
+        "description": "User notification management",
+        "item": [
+          {
+            "name": "List Notifications",
+            "request": {
+              "method": "GET",
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{token}}"
+                },
+                {
+                  "key": "Accept",
+                  "value": "application/json"
+                }
+              ],
+              "url": {
+                "raw": "{{base_url}}/notifications?is_read=false",
+                "host": ["{{base_url}}"],
+                "path": ["notifications"],
+                "query": [
+                  {
+                    "key": "is_read",
+                    "value": "false",
+                    "description": "Filter by read status"
+                  }
+                ]
+              },
+              "description": "Get list of notifications for the current user"
+            }
+          },
+          {
+            "name": "Get Notification Details",
+            "request": {
+              "method": "GET",
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{token}}"
+                },
+                {
+                  "key": "Accept",
+                  "value": "application/json"
+                }
+              ],
+              "url": {
+                "raw": "{{base_url}}/notifications/1",
+                "host": ["{{base_url}}"],
+                "path": ["notifications", "1"]
+              },
+              "description": "Get details for a specific notification"
+            }
+          },
+          {
+            "name": "Mark Notification as Read",
+            "request": {
+              "method": "PATCH",
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{token}}"
+                },
+                {
+                  "key": "Accept",
+                  "value": "application/json"
+                }
+              ],
+              "url": {
+                "raw": "{{base_url}}/notifications/1/read",
+                "host": ["{{base_url}}"],
+                "path": ["notifications", "1", "read"]
+              },
+              "description": "Mark a notification as read"
+            }
+          },
+          {
+            "name": "Delete Notification",
+            "request": {
+              "method": "DELETE",
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{token}}"
+                },
+                {
+                  "key": "Accept",
+                  "value": "application/json"
+                }
+              ],
+              "url": {
+                "raw": "{{base_url}}/notifications/1",
+                "host": ["{{base_url}}"],
+                "path": ["notifications", "1"]
+              },
+              "description": "Delete a notification"
+            }
+          }
+        ]
+      },
+      {
+        "name": "Service Capacity",
+        "description": "Service capacity management",
+        "item": [
+          {
+            "name": "List Service Capacities",
+            "request": {
+              "method": "GET",
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{token}}"
+                },
+                {
+                  "key": "Accept",
+                  "value": "application/json"
+                }
+              ],
+              "url": {
+                "raw": "{{base_url}}/service-capacity?center_id=1&service_type=consultation&date=2024-05-15",
+                "host": ["{{base_url}}"],
+                "path": ["service-capacity"],
+                "query": [
+                  {
+                    "key": "center_id",
+                    "value": "1",
+                    "description": "Filter by center"
+                  },
+                  {
+                    "key": "service_type",
+                    "value": "consultation",
+                    "description": "Filter by service type"
+                  },
+                  {
+                    "key": "date",
+                    "value": "2024-05-15",
+                    "description": "Filter by date"
+                  }
+                ]
+              },
+              "description": "Get list of service capacities"
+            }
+          },
+          {
+            "name": "Get Service Capacity Details",
+            "request": {
+              "method": "GET",
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{token}}"
+                },
+                {
+                  "key": "Accept",
+                  "value": "application/json"
+                }
+              ],
+              "url": {
+                "raw": "{{base_url}}/service-capacity/1",
+                "host": ["{{base_url}}"],
+                "path": ["service-capacity", "1"]
+              },
+              "description": "Get details for a specific service capacity"
+            }
+          },
+          {
+            "name": "Create Service Capacity",
+            "request": {
+              "method": "POST",
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{token}}"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "Accept",
+                  "value": "application/json"
+                }
+              ],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n    \"center_id\": 1,\n    \"service_type\": \"consultation\",\n    \"max_capacity\": 20,\n    \"date\": \"2024-05-15\",\n    \"start_time\": \"2024-05-15T08:00:00Z\",\n    \"end_time\": \"2024-05-15T17:00:00Z\",\n    \"is_active\": true,\n    \"notes\": \"Regular weekday capacity\"\n}"
+              },
+              "url": {
+                "raw": "{{base_url}}/service-capacity",
+                "host": ["{{base_url}}"],
+                "path": ["service-capacity"]
+              },
+              "description": "Create a new service capacity (Admin only)"
+            }
+          },
+          {
+            "name": "Update Service Capacity",
+            "request": {
+              "method": "PUT",
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{token}}"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "Accept",
+                  "value": "application/json"
+                }
+              ],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n    \"max_capacity\": 15,\n    \"is_active\": true,\n    \"notes\": \"Reduced capacity due to staff shortage\"\n}"
+              },
+              "url": {
+                "raw": "{{base_url}}/service-capacity/1",
+                "host": ["{{base_url}}"],
+                "path": ["service-capacity", "1"]
+              },
+              "description": "Update a service capacity (Admin only)"
+            }
+          },
+          {
+            "name": "Delete Service Capacity",
+            "request": {
+              "method": "DELETE",
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{token}}"
+                },
+                {
+                  "key": "Accept",
+                  "value": "application/json"
+                }
+              ],
+              "url": {
+                "raw": "{{base_url}}/service-capacity/1",
+                "host": ["{{base_url}}"],
+                "path": ["service-capacity", "1"]
+              },
+              "description": "Delete a service capacity (Admin only)"
+            }
+          }
+        ]
+      }
+    ],
+    "event": [
+      {
+        "listen": "prerequest",
+        "script": {
+          "type": "text/javascript",
+          "exec": [
+            "// Global pre-request scripts",
+            "pm.request.headers.add({",
+            "    key: 'X-Request-ID',",
+            "    value: pm.variables.replaceIn('{{$guid}}')",
+            "});"
+          ]
+        }
+      },
+      {
+        "listen": "test",
+        "script": {
+          "type": "text/javascript",
+          "exec": [
+            "// Global test scripts",
+            "pm.test(\"Response time is acceptable\", function() {",
+            "    pm.expect(pm.response.responseTime).to.be.below(1000);",
+            "});",
+            "",
+            "pm.test(\"Status code is successful\", function() {",
+            "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]);",
+            "});",
+            "",
+            "pm.test(\"Content-Type is application/json\", function() {",
+            "    pm.response.to.have.header(\"Content-Type\");",
+            "    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
+            "});"
+          ]
+        }
+      }
+    ],
+    "variable": [
+      {
+        "key": "base_url",
+        "value": "http://localhost:8000/api",
+        "type": "string",
+        "description": "API base URL"
+      },
+      {
+        "key": "token",
+        "value": "",
+        "type": "string",
+        "description": "Authentication token"
+      },
+      {
+        "key": "user_id",
+        "value": "",
+        "type": "string",
+        "description": "User ID for testing"
+      },
+      {
+        "key": "provider_id",
+        "value": "",
+        "type": "string",
+        "description": "Healthcare provider ID"
+      }
+    ]
+  }
+  
