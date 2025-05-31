@@ -5,10 +5,10 @@ import { UserRole } from '../types';
 
 /**
  * Custom hook for authentication-related functionality
- * @param requiredRole - Optional role required to access a page
+ * @param requiredRole - Optional role or array of roles required to access a page
  * @returns Authentication state and functions
  */
-export const useAuth = (requiredRole?: UserRole) => {
+export const useAuth = (requiredRole?: UserRole | UserRole[]) => {
   const {
     user,
     token,
@@ -29,15 +29,66 @@ export const useAuth = (requiredRole?: UserRole) => {
       if (!isAuthenticated) {
         // Redirect to login if not authenticated and a role is required
         navigate('/login');
+      } else if (Array.isArray(requiredRole)) {
+        // Check if user has one of the required roles
+        const hasRequiredRole = requiredRole.some(role => {
+          // Special case for Superuser - allow access to Admin pages
+          if (user?.role === 'Superuser' && role === 'Admin') {
+            return true;
+          }
+          return user?.role === role;
+        });
+
+        if (!hasRequiredRole) {
+          // Redirect to appropriate dashboard if authenticated but doesn't have any of the required roles
+          const dashboardUrl = getDashboardUrlByRole(user?.role);
+          navigate(dashboardUrl);
+        }
       } else if (user?.role !== requiredRole) {
-        // Redirect to dashboard if authenticated but doesn't have the required role
-        navigate('/dashboard');
+        // Special case for Superuser - allow access to Admin pages
+        if (user?.role === 'Superuser' && requiredRole === 'Admin') {
+          // Allow Superuser to access Admin pages
+          return;
+        }
+
+        // Redirect to appropriate dashboard if authenticated but doesn't have the required role
+        const dashboardUrl = getDashboardUrlByRole(user?.role);
+        navigate(dashboardUrl);
       }
     }
   }, [isAuthenticated, isLoading, user, requiredRole, navigate]);
 
-  // Check if user has a specific role
-  const hasRole = (role: UserRole): boolean => {
+  // Helper function to get dashboard URL based on user role
+  const getDashboardUrlByRole = (role?: string): string => {
+    switch (role) {
+      case 'Patient':
+        return '/patient/dashboard';
+      case 'Provider':
+        return '/provider/dashboard';
+      case 'Admin':
+      case 'Superuser':
+        return '/admin/dashboard';
+      default:
+        return '/dashboard';
+    }
+  };
+
+  // Check if user has a specific role or one of the roles in an array
+  const hasRole = (role: UserRole | UserRole[]): boolean => {
+    if (Array.isArray(role)) {
+      return role.some(r => {
+        // Special case: Superuser can access Admin pages
+        if (r === 'Admin' && user?.role === 'Superuser') {
+          return true;
+        }
+        return user?.role === r;
+      });
+    }
+
+    // Special case: Superuser can access Admin pages
+    if (role === 'Admin' && user?.role === 'Superuser') {
+      return true;
+    }
     return user?.role === role;
   };
 
@@ -53,7 +104,12 @@ export const useAuth = (requiredRole?: UserRole) => {
 
   // Check if user is an admin
   const isAdmin = (): boolean => {
-    return hasRole('Admin');
+    return hasRole('Admin') || user?.role === 'Superuser';
+  };
+
+  // Check if user is a superuser
+  const isSuperuser = (): boolean => {
+    return user?.role === 'Superuser';
   };
 
   return {
@@ -70,6 +126,7 @@ export const useAuth = (requiredRole?: UserRole) => {
     isPatient,
     isProvider,
     isAdmin,
+    isSuperuser,
   };
 };
 

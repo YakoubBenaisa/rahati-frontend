@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { MainLayout } from '../../../layouts';
-import { Card, Button, Badge, Input, Select } from '../../../components/ui';
+import { Card, Button, Badge, Input, Select, Alert } from '../../../components/ui';
 import { useAuth } from '../../../hooks';
 import { motion } from 'framer-motion';
+import { consultationsAPI } from '../../../services/api';
 
 interface Consultation {
   id: number;
@@ -23,62 +24,54 @@ const PatientConsultations: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
 
-  // Mock fetch consultations data
+  // State for error handling
+  const [error, setError] = useState<string | null>(null);
+
+  // Fetch consultations data from API
   useEffect(() => {
-    setIsLoading(true);
-    // Simulate API call
-    setTimeout(() => {
-      const mockConsultations: Consultation[] = [
-        {
-          id: 1,
-          date: '2023-05-15',
-          time: '10:00 AM',
-          provider: 'Dr. John Smith',
-          center: 'Main Medical Center',
-          status: 'completed',
-          diagnosis: 'Common cold'
-        },
-        {
-          id: 2,
-          date: '2023-06-10',
-          time: '2:30 PM',
-          provider: 'Dr. Sarah Johnson',
-          center: 'Downtown Clinic',
-          status: 'active'
-        },
-        {
-          id: 3,
-          date: '2023-04-02',
-          time: '11:15 AM',
-          provider: 'Dr. Michael Brown',
-          center: 'Main Medical Center',
-          status: 'completed',
-          diagnosis: 'Seasonal allergies'
-        },
-        {
-          id: 4,
-          date: '2023-03-20',
-          time: '9:45 AM',
-          provider: 'Dr. Emily Davis',
-          center: 'Westside Health Center',
-          status: 'cancelled'
-        }
-      ];
-      setConsultations(mockConsultations);
-      setFilteredConsultations(mockConsultations);
-      setIsLoading(false);
-    }, 1000);
+    const fetchConsultations = async () => {
+      setIsLoading(true);
+      setError(null);
+
+      try {
+        const response = await consultationsAPI.getConsultations();
+        const data = response.data.data || response.data;
+
+        // Transform API data to match our interface
+        const formattedData = data.map((item: any) => ({
+          id: item.id,
+          date: item.date,
+          time: item.time || '12:00',
+          provider: item.provider?.name || 'Unknown Provider',
+          center: item.center?.name || 'Unknown Center',
+          status: item.status || 'active',
+          diagnosis: item.diagnosis
+        }));
+
+        setConsultations(formattedData);
+        setFilteredConsultations(formattedData);
+      } catch (err: any) {
+        console.error('Error fetching consultations:', err);
+        setError(err.response?.data?.message || 'Failed to load consultations. Please try again.');
+        setConsultations([]);
+        setFilteredConsultations([]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchConsultations();
   }, []);
 
   // Filter consultations based on search term and status
   useEffect(() => {
     let filtered = consultations;
-    
+
     // Filter by status
     if (statusFilter !== 'all') {
       filtered = filtered.filter(consultation => consultation.status === statusFilter);
     }
-    
+
     // Filter by search term
     if (searchTerm.trim() !== '') {
       const term = searchTerm.toLowerCase();
@@ -89,7 +82,7 @@ const PatientConsultations: React.FC = () => {
           (consultation.diagnosis && consultation.diagnosis.toLowerCase().includes(term))
       );
     }
-    
+
     setFilteredConsultations(filtered);
   }, [searchTerm, statusFilter, consultations]);
 
@@ -179,6 +172,12 @@ const PatientConsultations: React.FC = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
         >
+          {error && (
+            <Alert variant="error" className="mb-6" dismissible onDismiss={() => setError(null)}>
+              {error}
+            </Alert>
+          )}
+
           {isLoading ? (
             <div className="flex justify-center py-12">
               <svg className="animate-spin h-8 w-8 text-primary-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -206,8 +205,8 @@ const PatientConsultations: React.FC = () => {
                     <div className="flex items-center">
                       <div className="flex-shrink-0">
                         <div className={`h-12 w-12 rounded-full flex items-center justify-center text-lg font-semibold ${
-                          consultation.status === 'active' 
-                            ? 'bg-blue-100 text-blue-600' 
+                          consultation.status === 'active'
+                            ? 'bg-blue-100 text-blue-600'
                             : consultation.status === 'completed'
                             ? 'bg-green-100 text-green-600'
                             : 'bg-red-100 text-red-600'

@@ -1,121 +1,136 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { MainLayout } from '../../../layouts';
-import { Card, Button, Input, Badge, Select } from '../../../components/ui';
+import { Card, Input, Badge, Select, Spinner, Alert } from '../../../components/ui';
 import { useAuth } from '../../../hooks';
 import { motion } from 'framer-motion';
-
-interface User {
-  id: number;
-  name: string;
-  email: string;
-  role: 'Patient' | 'Provider' | 'Admin';
-  status: 'active' | 'inactive';
-  createdAt: string;
-}
+import { usersAPI, centersAPI } from '../../../services/api';
+import { User, Center } from '../../../types';
+import { formatDate } from '../../../utils/dateUtils';
+import { useAuthStore } from '../../../store';
 
 const AdminUsersPage: React.FC = () => {
   const { user } = useAuth('Admin');
+  const authStore = useAuthStore();
   const [isLoading, setIsLoading] = useState(false);
   const [users, setUsers] = useState<User[]>([]);
   const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [roleFilter, setRoleFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all');
+  const [error, setError] = useState<string | null>(null);
+  const [centers, setCenters] = useState<Center[]>([]);
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [totalPages, setTotalPages] = useState<number>(1);
+  const [totalItems, setTotalItems] = useState<number>(0);
+  const itemsPerPage = 10;
 
-  // Mock fetch users data
+  // Check if user can create new users
+  const canCreateUsers = authStore.user?.role === 'Superuser' || authStore.user?.role === 'Admin';
+
+  // No longer needed as we're using the Link component directly
+
+  // Fetch centers for reference
   useEffect(() => {
-    setIsLoading(true);
-    // Simulate API call
-    setTimeout(() => {
-      const mockUsers: User[] = [
-        {
-          id: 1,
-          name: 'John Doe',
-          email: 'john.doe@example.com',
-          role: 'Patient',
-          status: 'active',
-          createdAt: '2023-01-15'
-        },
-        {
-          id: 2,
-          name: 'Jane Smith',
-          email: 'jane.smith@example.com',
-          role: 'Provider',
-          status: 'active',
-          createdAt: '2023-02-20'
-        },
-        {
-          id: 3,
-          name: 'Robert Johnson',
-          email: 'robert.johnson@example.com',
-          role: 'Patient',
-          status: 'inactive',
-          createdAt: '2023-03-10'
-        },
-        {
-          id: 4,
-          name: 'Emily Davis',
-          email: 'emily.davis@example.com',
-          role: 'Provider',
-          status: 'active',
-          createdAt: '2023-04-05'
-        },
-        {
-          id: 5,
-          name: 'Michael Wilson',
-          email: 'michael.wilson@example.com',
-          role: 'Admin',
-          status: 'active',
-          createdAt: '2023-01-01'
-        }
-      ];
-      setUsers(mockUsers);
-      setFilteredUsers(mockUsers);
-      setIsLoading(false);
-    }, 1000);
+    const fetchCenters = async () => {
+      try {
+        const response = await centersAPI.getCenters();
+        setCenters(response.data.data || response.data);
+      } catch (err) {
+        console.error('Error fetching centers:', err);
+      }
+    };
+
+    fetchCenters();
   }, []);
 
-  // Filter users based on search term, role, and status
+  // Fetch users data from API
   useEffect(() => {
-    let filtered = users;
-    
-    // Filter by role
-    if (roleFilter !== 'all') {
-      filtered = filtered.filter(user => user.role === roleFilter);
-    }
-    
-    // Filter by status
-    if (statusFilter !== 'all') {
-      filtered = filtered.filter(user => user.status === statusFilter);
-    }
-    
-    // Filter by search term
+    const fetchUsers = async () => {
+      setIsLoading(true);
+      setError(null);
+
+      try {
+        // If user is an Admin (not Superuser), restrict to their center
+        const params: any = {
+          page: currentPage,
+          per_page: itemsPerPage,
+          role: roleFilter !== 'all' ? roleFilter : undefined
+        };
+
+        // Add center_id filter for Admin users (not Superuser)
+        if (user?.role === 'Admin' && user?.center_id) {
+          params.center_id = user.center_id;
+        }
+
+        const response = await usersAPI.getUsers(params);
+
+        const data = response.data;
+        const usersList = data.data || data;
+
+        // Map API response to our User type
+        const mappedUsers = usersList.map((apiUser: any) => ({
+          ...apiUser,
+          // Add any missing properties or transformations here
+        }));
+
+        setUsers(mappedUsers);
+        setFilteredUsers(mappedUsers);
+
+        // Handle pagination if available
+        if (data.meta) {
+          setTotalPages(data.meta.last_page);
+          setTotalItems(data.meta.total);
+        }
+      } catch (err) {
+        console.error('Error fetching users:', err);
+        setError('Failed to load users. Please try again.');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchUsers();
+  }, [currentPage, roleFilter, user]);
+
+  // Filter users based on search term
+  useEffect(() => {
+    // Only filter by search term locally
+    // Role filtering is handled by the API
     if (searchTerm.trim() !== '') {
       const term = searchTerm.toLowerCase();
-      filtered = filtered.filter(
+      const filtered = users.filter(
         user =>
           user.name.toLowerCase().includes(term) ||
           user.email.toLowerCase().includes(term)
       );
+      setFilteredUsers(filtered);
+    } else {
+      setFilteredUsers(users);
     }
-    
-    setFilteredUsers(filtered);
-  }, [searchTerm, roleFilter, statusFilter, users]);
+  }, [searchTerm, users]);
+
+  // Handle page change
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
 
   // Handle search input change
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
   };
 
-  // Handle role filter change
+  // Handle role filter change - this will trigger a new API call
   const handleRoleFilterChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setRoleFilter(e.target.value);
+    setCurrentPage(1); // Reset to first page when changing filters
   };
 
-  // Handle status filter change
-  const handleStatusFilterChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setStatusFilter(e.target.value);
+  // Get center name by ID
+  const getCenterName = (centerId?: number) => {
+    if (!centerId) return 'N/A';
+    const center = centers.find(c => c.id === centerId);
+    return center ? center.name : `Center #${centerId}`;
   };
 
   return (
@@ -134,21 +149,26 @@ const AdminUsersPage: React.FC = () => {
               </p>
             </div>
             <div className="mt-4 md:mt-0">
-              <Button
-                as={Link}
-                to="/admin/users/new"
-                variant="primary"
-                leftIcon={
-                  <svg className="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              {canCreateUsers && (
+                <Link to="/admin/users/new" className="inline-flex items-center justify-center font-medium rounded-md focus:outline-none transition-all duration-200 px-4 py-2 text-base bg-[var(--color-primary-600)] text-white hover:bg-[var(--color-primary-700)] focus:ring-2 focus:ring-[var(--color-primary-500)] focus:ring-offset-2">
+                  <svg className="h-5 w-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                   </svg>
-                }
-              >
-                Add New User
-              </Button>
+                  Add New User
+                </Link>
+              )}
             </div>
           </div>
         </motion.div>
+
+        {error && (
+          <Alert
+            variant="error"
+            message={error}
+            onClose={() => setError(null)}
+            className="mb-6"
+          />
+        )}
 
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -158,7 +178,7 @@ const AdminUsersPage: React.FC = () => {
         >
           <Card>
             <div className="flex flex-col md:flex-row md:items-center gap-4">
-              <div className="w-full md:w-1/2">
+              <div className="w-full md:w-2/3">
                 <Input
                   placeholder="Search by name or email..."
                   value={searchTerm}
@@ -170,7 +190,7 @@ const AdminUsersPage: React.FC = () => {
                   }
                 />
               </div>
-              <div className="w-full md:w-1/4">
+              <div className="w-full md:w-1/3">
                 <Select
                   value={roleFilter}
                   onChange={handleRoleFilterChange}
@@ -178,24 +198,31 @@ const AdminUsersPage: React.FC = () => {
                     { value: 'all', label: 'All Roles' },
                     { value: 'Patient', label: 'Patient' },
                     { value: 'Provider', label: 'Provider' },
-                    { value: 'Admin', label: 'Admin' }
-                  ]}
-                />
-              </div>
-              <div className="w-full md:w-1/4">
-                <Select
-                  value={statusFilter}
-                  onChange={handleStatusFilterChange}
-                  options={[
-                    { value: 'all', label: 'All Statuses' },
-                    { value: 'active', label: 'Active' },
-                    { value: 'inactive', label: 'Inactive' }
+                    { value: 'Admin', label: 'Admin' },
+                    { value: 'Superuser', label: 'Superuser' }
                   ]}
                 />
               </div>
             </div>
             <div className="mt-4 text-sm text-gray-500">
-              {filteredUsers.length} {filteredUsers.length === 1 ? 'user' : 'users'} found
+              {totalItems > 0 ? (
+                <span>
+                  Showing {filteredUsers.length} of {totalItems} {totalItems === 1 ? 'user' : 'users'}
+                </span>
+              ) : (
+                <span>
+                  {filteredUsers.length} {filteredUsers.length === 1 ? 'user' : 'users'} found
+                </span>
+              )}
+
+              {user?.role === 'Admin' && user?.center_id && (
+                <div className="mt-2 text-xs text-blue-600 bg-blue-50 p-2 rounded">
+                  <svg className="inline-block h-4 w-4 mr-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  As an admin, you can only see users from your assigned center: {getCenterName(user.center_id)}
+                </div>
+              )}
             </div>
           </Card>
         </motion.div>
@@ -206,11 +233,9 @@ const AdminUsersPage: React.FC = () => {
           transition={{ delay: 0.2 }}
         >
           {isLoading ? (
-            <div className="flex justify-center py-12">
-              <svg className="animate-spin h-8 w-8 text-primary-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-              </svg>
+            <div className="flex justify-center items-center py-12">
+              <Spinner size="lg" />
+              <span className="ml-3 text-[var(--color-text-secondary)]">Loading users...</span>
             </div>
           ) : filteredUsers.length === 0 ? (
             <Card>
@@ -220,17 +245,13 @@ const AdminUsersPage: React.FC = () => {
                 </svg>
                 <h3 className="mt-2 text-sm font-medium text-gray-900">No users found</h3>
                 <p className="mt-1 text-sm text-gray-500">
-                  {searchTerm || roleFilter !== 'all' || statusFilter !== 'all' ? 'Try adjusting your filters.' : 'Add a new user to get started.'}
+                  {searchTerm || roleFilter !== 'all' ? 'Try adjusting your filters.' : 'Add a new user to get started.'}
                 </p>
-                {!searchTerm && roleFilter === 'all' && statusFilter === 'all' && (
+                {!searchTerm && roleFilter === 'all' && canCreateUsers && (
                   <div className="mt-6">
-                    <Button
-                      as={Link}
-                      to="/admin/users/new"
-                      variant="primary"
-                    >
+                    <Link to="/admin/users/new" className="inline-flex items-center justify-center font-medium rounded-md focus:outline-none transition-all duration-200 px-4 py-2 text-base bg-[var(--color-primary-600)] text-white hover:bg-[var(--color-primary-700)] focus:ring-2 focus:ring-[var(--color-primary-500)] focus:ring-offset-2">
                       Add New User
-                    </Button>
+                    </Link>
                   </div>
                 )}
               </div>
@@ -247,7 +268,10 @@ const AdminUsersPage: React.FC = () => {
                       Role
                     </th>
                     <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Status
+                      Center
+                    </th>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Contact
                     </th>
                     <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Created At
@@ -274,6 +298,7 @@ const AdminUsersPage: React.FC = () => {
                       <td className="px-6 py-4 whitespace-nowrap">
                         <Badge
                           variant={
+                            user.role === 'Superuser' ? 'danger' :
                             user.role === 'Admin' ? 'primary' :
                             user.role === 'Provider' ? 'secondary' :
                             'info'
@@ -282,40 +307,55 @@ const AdminUsersPage: React.FC = () => {
                           {user.role}
                         </Badge>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <Badge
-                          variant={user.status === 'active' ? 'success' : 'danger'}
-                        >
-                          {user.status === 'active' ? 'Active' : 'Inactive'}
-                        </Badge>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {getCenterName(user.center_id)}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {new Date(user.createdAt).toLocaleDateString()}
+                        {user.phone || 'N/A'}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {user.created_at ? formatDate(user.created_at) : 'N/A'}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                         <div className="flex justify-end space-x-2">
-                          <Button
-                            as={Link}
+                          <Link
                             to={`/admin/users/${user.id}`}
-                            variant="outline"
-                            size="sm"
+                            className="inline-flex items-center justify-center font-medium rounded-md focus:outline-none transition-all duration-200 px-3 py-1 text-sm border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 focus:ring-2 focus:ring-[var(--color-primary-500)] focus:ring-offset-2"
                           >
                             View
-                          </Button>
-                          <Button
-                            as={Link}
+                          </Link>
+                          <Link
                             to={`/admin/users/${user.id}/edit`}
-                            variant="primary"
-                            size="sm"
+                            className="inline-flex items-center justify-center font-medium rounded-md focus:outline-none transition-all duration-200 px-3 py-1 text-sm bg-[var(--color-primary-600)] text-white hover:bg-[var(--color-primary-700)] focus:ring-2 focus:ring-[var(--color-primary-500)] focus:ring-offset-2"
                           >
                             Edit
-                          </Button>
+                          </Link>
                         </div>
                       </td>
                     </tr>
                   ))}
                 </tbody>
               </table>
+
+              {totalPages > 1 && (
+                <div className="py-4 px-6 flex justify-center">
+                  <div className="flex space-x-2">
+                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                      <button
+                        key={page}
+                        className={`inline-flex items-center justify-center font-medium rounded-md focus:outline-none transition-all duration-200 px-3 py-1 text-sm ${
+                          currentPage === page
+                            ? 'bg-[var(--color-primary-600)] text-white hover:bg-[var(--color-primary-700)]'
+                            : 'border border-gray-300 bg-white text-gray-700 hover:bg-gray-50'
+                        } focus:ring-2 focus:ring-[var(--color-primary-500)] focus:ring-offset-2`}
+                        onClick={() => handlePageChange(page)}
+                      >
+                        {page}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </motion.div>

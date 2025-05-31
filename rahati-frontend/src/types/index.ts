@@ -1,5 +1,5 @@
 // User related types
-export type UserRole = 'Patient' | 'Provider' | 'Admin';
+export type UserRole = 'Patient' | 'Provider' | 'Admin' | 'Superuser';
 
 export interface User {
   id: number;
@@ -8,6 +8,7 @@ export interface User {
   role: UserRole;
   phone?: string;
   address?: string;
+  center_id?: number;
   caregiver_name?: string;
   caregiver_phone?: string;
   created_at?: string;
@@ -46,6 +47,7 @@ export interface Appointment {
   provider_id: number;
   appointment_datetime: string;
   appointment_duration: number;
+  appointment_type?: string;
   status: AppointmentStatus;
   notes?: string;
   created_at?: string;
@@ -56,7 +58,7 @@ export interface Appointment {
 }
 
 // Consultation related types
-export type ConsultationStatus = 'active' | 'completed' | 'cancelled';
+export type ConsultationStatus = 'scheduled' | 'in_progress' | 'completed' | 'cancelled';
 
 export interface Consultation {
   id: number;

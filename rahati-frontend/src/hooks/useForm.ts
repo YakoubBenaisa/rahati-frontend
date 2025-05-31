@@ -10,17 +10,17 @@ import { useState, ChangeEvent, FormEvent } from 'react';
 export const useForm = <T extends Record<string, any>>(
   initialValues: T,
   onSubmit: (values: T, resetForm: () => void) => void,
-  validate?: (values: T) => Partial<Record<keyof T, string>>
+  validate?: (values: T) => Record<string, string>
 ) => {
   const [values, setValues] = useState<T>(initialValues);
-  const [errors, setErrors] = useState<Partial<Record<keyof T, string>>>({});
-  const [touched, setTouched] = useState<Partial<Record<keyof T, boolean>>>({});
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [touched, setTouched] = useState<Record<string, boolean>>({});
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
-  
+
   // Handle input changes
   const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value, type } = e.target as HTMLInputElement;
-    
+
     // Handle checkbox inputs
     if (type === 'checkbox') {
       const { checked } = e.target as HTMLInputElement;
@@ -34,7 +34,7 @@ export const useForm = <T extends Record<string, any>>(
         [name]: value,
       });
     }
-    
+
     // Clear error when field is changed
     if (errors[name as keyof T]) {
       setErrors({
@@ -43,16 +43,16 @@ export const useForm = <T extends Record<string, any>>(
       });
     }
   };
-  
+
   // Handle input blur (for validation)
   const handleBlur = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name } = e.target;
-    
+
     setTouched({
       ...touched,
       [name]: true,
     });
-    
+
     // Validate on blur if validation function is provided
     if (validate) {
       const validationErrors = validate(values);
@@ -62,32 +62,32 @@ export const useForm = <T extends Record<string, any>>(
       }));
     }
   };
-  
+
   // Handle form submission
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    
+
     // Validate all fields if validation function is provided
     if (validate) {
       const validationErrors = validate(values);
       setErrors(validationErrors);
-      
+
       // Mark all fields as touched
       const allTouched = Object.keys(values).reduce((acc, key) => {
-        acc[key as keyof T] = true;
+        acc[key] = true;
         return acc;
-      }, {} as Partial<Record<keyof T, boolean>>);
-      
+      }, {} as Record<string, boolean>);
+
       setTouched(allTouched);
-      
+
       // Don't submit if there are validation errors
       if (Object.keys(validationErrors).length > 0) {
         return;
       }
     }
-    
+
     setIsSubmitting(true);
-    
+
     try {
       await onSubmit(values, resetForm);
     } catch (error) {
@@ -96,7 +96,7 @@ export const useForm = <T extends Record<string, any>>(
       setIsSubmitting(false);
     }
   };
-  
+
   // Reset form to initial values
   const resetForm = () => {
     setValues(initialValues);
@@ -104,14 +104,14 @@ export const useForm = <T extends Record<string, any>>(
     setTouched({});
     setIsSubmitting(false);
   };
-  
+
   // Set a specific field value
   const setFieldValue = (field: keyof T, value: any) => {
     setValues(prev => ({
       ...prev,
       [field]: value,
     }));
-    
+
     // Clear error when field is changed
     if (errors[field]) {
       setErrors(prev => ({
@@ -120,14 +120,14 @@ export const useForm = <T extends Record<string, any>>(
       }));
     }
   };
-  
+
   // Set multiple field values at once
   const setMultipleFields = (newValues: Partial<T>) => {
     setValues(prev => ({
       ...prev,
       ...newValues,
     }));
-    
+
     // Clear errors for changed fields
     const clearedErrors = { ...errors };
     Object.keys(newValues).forEach(key => {
@@ -135,10 +135,10 @@ export const useForm = <T extends Record<string, any>>(
         clearedErrors[key as keyof T] = undefined;
       }
     });
-    
+
     setErrors(clearedErrors);
   };
-  
+
   return {
     values,
     errors,

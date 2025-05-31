@@ -4,12 +4,12 @@ import { MainLayout } from '../../../layouts';
 import { Card, Button, Alert, Spinner, Badge, Table, Pagination } from '../../../components/ui';
 import { useAuth } from '../../../hooks';
 import { motion } from 'framer-motion';
-import { appointmentsAPI } from '../../../services/api';
-import { Appointment } from '../../../types';
+import { appointmentsAPI, centersAPI } from '../../../services/api';
+import { Appointment, AppointmentStatus, Center } from '../../../types';
 import { formatDate } from '../../../utils/dateUtils';
 
 const AdminAppointmentsPage: React.FC = () => {
-  const { user } = useAuth('Admin');
+  const { user } = useAuth(['Admin', 'Superuser']);
   const navigate = useNavigate();
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -24,16 +24,24 @@ const AdminAppointmentsPage: React.FC = () => {
     const fetchAppointments = async () => {
       setIsLoading(true);
       setError(null);
-      
+
       try {
-        const response = await appointmentsAPI.getAppointments({
+        // If user is an Admin (not Superuser), restrict to their center
+        const params: any = {
           page: currentPage,
           per_page: itemsPerPage
-        });
-        
+        };
+
+        // Add center_id filter for Admin users (not Superuser)
+        if (user?.role === 'Admin' && user?.center_id) {
+          params.center_id = user.center_id;
+        }
+
+        const response = await appointmentsAPI.getAppointments(params);
+
         const data = response.data;
         setAppointments(data.data || data);
-        
+
         // Handle pagination if available
         if (data.meta) {
           setTotalPages(data.meta.last_page);
@@ -46,24 +54,44 @@ const AdminAppointmentsPage: React.FC = () => {
         setIsLoading(false);
       }
     };
-    
+
     fetchAppointments();
-  }, [currentPage]);
+  }, [currentPage, user]);
 
   // Handle page change
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
   };
 
+  // State for center name
+  const [centerName, setCenterName] = useState<string>('');
+
+  // Fetch center name if admin
+  useEffect(() => {
+    const fetchCenterName = async () => {
+      if (user?.role === 'Admin' && user?.center_id) {
+        try {
+          const response = await centersAPI.getCenterById(user.center_id);
+          const centerData = response.data.data || response.data;
+          setCenterName(centerData.name);
+        } catch (err) {
+          console.error('Error fetching center name:', err);
+        }
+      }
+    };
+
+    fetchCenterName();
+  }, [user]);
+
   // Get status badge variant
-  const getStatusBadgeVariant = (status: string) => {
+  const getStatusBadgeVariant = (status: string): 'primary' | 'success' | 'danger' | 'warning' | 'secondary' => {
     switch (status) {
       case 'scheduled':
         return 'primary';
       case 'completed':
         return 'success';
       case 'cancelled':
-        return 'error';
+        return 'danger';
       case 'rescheduled':
         return 'warning';
       default:
@@ -83,8 +111,18 @@ const AdminAppointmentsPage: React.FC = () => {
             <div>
               <h1 className="text-3xl font-bold text-[var(--color-text-primary)]">Appointments</h1>
               <p className="mt-2 text-[var(--color-text-secondary)]">
-                Manage all appointments across healthcare centers.
+                {user?.role === 'Admin' && centerName ?
+                  `Manage appointments for ${centerName}.` :
+                  'Manage all appointments across healthcare centers.'}
               </p>
+              {user?.role === 'Admin' && (
+                <p className="mt-2 text-sm text-blue-600 bg-blue-50 p-2 rounded">
+                  <svg className="inline-block h-4 w-4 mr-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  As an admin, you can only see appointments for your assigned center.
+                </p>
+              )}
             </div>
             <div className="mt-4 md:mt-0">
               <Button
@@ -198,7 +236,7 @@ const AdminAppointmentsPage: React.FC = () => {
                     ))}
                   </Table.Body>
                 </Table>
-                
+
                 {totalPages > 1 && (
                   <div className="py-4 px-6 flex justify-center">
                     <Pagination

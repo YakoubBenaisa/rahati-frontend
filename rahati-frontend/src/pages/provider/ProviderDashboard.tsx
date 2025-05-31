@@ -342,7 +342,19 @@ const ProviderDashboard: React.FC<ProviderDashboardProps> = () => {
                 </svg>
               </div>
               <h3 className="text-lg font-medium text-gray-900 mb-2">Manage Schedule</h3>
-              <p className="text-gray-600">View and update your availability and appointments.</p>
+              <p className="text-gray-600">View and update your availability.</p>
+            </Link>
+          </Card>
+
+          <Card className="h-full hover:shadow-lg transition-shadow duration-300">
+            <Link to="/provider/appointments" className="flex flex-col items-center text-center p-4">
+              <div className="p-3 rounded-full bg-blue-100 text-blue-600 mb-4">
+                <svg className="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">My Appointments</h3>
+              <p className="text-gray-600">View and manage your appointments.</p>
             </Link>
           </Card>
 
@@ -354,7 +366,7 @@ const ProviderDashboard: React.FC<ProviderDashboardProps> = () => {
                 </svg>
               </div>
               <h3 className="text-lg font-medium text-gray-900 mb-2">Patient Records</h3>
-              <p className="text-gray-600">Access and manage your patient records and history.</p>
+              <p className="text-gray-600">Access and manage your patient records.</p>
             </Link>
           </Card>
 
@@ -367,18 +379,6 @@ const ProviderDashboard: React.FC<ProviderDashboardProps> = () => {
               </div>
               <h3 className="text-lg font-medium text-gray-900 mb-2">Consultations</h3>
               <p className="text-gray-600">View and manage your consultation records.</p>
-            </Link>
-          </Card>
-
-          <Card className="h-full hover:shadow-lg transition-shadow duration-300">
-            <Link to="/provider/profile" className="flex flex-col items-center text-center p-4">
-              <div className="p-3 rounded-full bg-yellow-100 text-yellow-600 mb-4">
-                <svg className="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                </svg>
-              </div>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">Update Profile</h3>
-              <p className="text-gray-600">Update your professional profile and specialties.</p>
             </Link>
           </Card>
         </div>

@@ -1,18 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { MainLayout } from '../../../layouts';
-import { Card, Button, Input, Badge } from '../../../components/ui';
+import { Card, Button, Input, Badge, Spinner, Alert } from '../../../components/ui';
 import { useAuth } from '../../../hooks';
 import { motion } from 'framer-motion';
+import { usersAPI, appointmentsAPI } from '../../../services/api';
+import { formatDate } from '../../../utils/dateUtils';
 
 interface Patient {
   id: number;
   name: string;
   email: string;
-  phone: string;
-  lastVisit: string;
-  upcomingAppointment: string | null;
+  phone?: string;
+  lastVisit?: string;
+  upcomingAppointment?: string | null;
   status: 'active' | 'inactive';
+  role: string;
 }
 
 const ProviderPatientsPage: React.FC = () => {
@@ -21,64 +24,152 @@ const ProviderPatientsPage: React.FC = () => {
   const [patients, setPatients] = useState<Patient[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [filteredPatients, setFilteredPatients] = useState<Patient[]>([]);
+  const [error, setError] = useState<string | null>(null);
+  const [patientAppointments, setPatientAppointments] = useState<Record<number, string>>({});
 
-  // Mock fetch patients data
+  // Fetch patients data from API
   useEffect(() => {
-    setIsLoading(true);
-    // Simulate API call
-    setTimeout(() => {
-      const mockPatients: Patient[] = [
-        {
-          id: 1,
-          name: 'John Doe',
-          email: 'john.doe@example.com',
-          phone: '(555) 123-4567',
-          lastVisit: '2023-05-15',
-          upcomingAppointment: '2023-06-10 10:00 AM',
-          status: 'active'
-        },
-        {
-          id: 2,
-          name: 'Jane Smith',
-          email: 'jane.smith@example.com',
-          phone: '(555) 987-6543',
-          lastVisit: '2023-04-22',
-          upcomingAppointment: '2023-06-15 2:30 PM',
-          status: 'active'
-        },
-        {
-          id: 3,
-          name: 'Robert Johnson',
-          email: 'robert.johnson@example.com',
-          phone: '(555) 456-7890',
-          lastVisit: '2023-05-30',
-          upcomingAppointment: null,
-          status: 'active'
-        },
-        {
-          id: 4,
-          name: 'Emily Davis',
-          email: 'emily.davis@example.com',
-          phone: '(555) 234-5678',
-          lastVisit: '2023-03-10',
-          upcomingAppointment: '2023-06-20 11:15 AM',
-          status: 'active'
-        },
-        {
-          id: 5,
-          name: 'Michael Wilson',
-          email: 'michael.wilson@example.com',
-          phone: '(555) 876-5432',
-          lastVisit: '2023-02-28',
-          upcomingAppointment: null,
-          status: 'inactive'
+    const fetchPatients = async () => {
+      setIsLoading(true);
+      setError(null);
+
+      try {
+        // Get patients assigned to this provider using the provider-specific endpoint
+        const response = await usersAPI.getMyPatientsDetailed();
+        console.log('My patients detailed response:', response.data);
+
+        const patientsData = response.data.data || response.data;
+
+        // Process patients data - the detailed endpoint already includes appointment info
+        const processedPatients: Patient[] = patientsData.map((patientData: any) => {
+          const patient = patientData.patient || patientData;
+          const appointments = patientData.appointments || [];
+
+          // Find the last visit (most recent past appointment)
+          const now = new Date();
+          const pastAppointments = appointments.filter((apt: any) =>
+            new Date(apt.appointment_datetime) < now
+          ).sort((a: any, b: any) =>
+            new Date(b.appointment_datetime).getTime() - new Date(a.appointment_datetime).getTime()
+          );
+
+          // Find upcoming appointment (nearest future appointment)
+          const futureAppointments = appointments.filter((apt: any) =>
+            new Date(apt.appointment_datetime) > now
+          ).sort((a: any, b: any) =>
+            new Date(a.appointment_datetime).getTime() - new Date(b.appointment_datetime).getTime()
+          );
+
+          return {
+            id: patient.id,
+            name: patient.name,
+            email: patient.email,
+            phone: patient.phone || 'Not provided',
+            status: patient.is_active ? 'active' : 'inactive',
+            role: patient.role,
+            lastVisit: pastAppointments.length > 0 ? pastAppointments[0].appointment_datetime : undefined,
+            upcomingAppointment: futureAppointments.length > 0 ? futureAppointments[0].appointment_datetime : null
+          };
+        });
+
+        setPatients(processedPatients);
+        setFilteredPatients(processedPatients);
+      } catch (err) {
+        console.error('Error fetching patients:', err);
+        setError('Failed to load patients. Please try again.');
+
+        // Fallback to regular users API if the provider-specific endpoint fails
+        try {
+          const fallbackResponse = await usersAPI.getUsers({ role: 'Patient' });
+          const fallbackData = fallbackResponse.data.data || fallbackResponse.data;
+
+          // Process patients data
+          const fallbackPatients: Patient[] = fallbackData.map((patient: any) => ({
+            id: patient.id,
+            name: patient.name,
+            email: patient.email,
+            phone: patient.phone || 'Not provided',
+            status: patient.is_active ? 'active' : 'inactive',
+            role: patient.role
+          }));
+
+          setPatients(fallbackPatients);
+          setFilteredPatients(fallbackPatients);
+
+          // Fetch appointments for each patient
+          fetchPatientAppointments(fallbackPatients);
+
+          setError('Using limited patient data. Some appointment information may be missing.');
+        } catch (fallbackErr) {
+          console.error('Fallback error fetching patients:', fallbackErr);
+          setError('Failed to load patients. Please try again later.');
         }
-      ];
-      setPatients(mockPatients);
-      setFilteredPatients(mockPatients);
-      setIsLoading(false);
-    }, 1000);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchPatients();
   }, []);
+
+  // Fetch appointments for patients
+  const fetchPatientAppointments = async (patientsList: Patient[]) => {
+    try {
+      // Get all appointments
+      const response = await appointmentsAPI.getAppointments();
+      const appointmentsData = response.data.data || response.data;
+
+      // Create a map of patient ID to their latest appointment
+      const appointmentMap: Record<number, string> = {};
+      const lastVisitMap: Record<number, string> = {};
+
+      appointmentsData.forEach((appointment: any) => {
+        const patientId = appointment.patient_id;
+        const appointmentDate = new Date(appointment.appointment_datetime);
+        const now = new Date();
+
+        // If appointment is in the future and patient doesn't have an upcoming appointment yet
+        // or the appointment is sooner than the current upcoming one
+        if (appointmentDate > now &&
+            (!appointmentMap[patientId] ||
+             new Date(appointmentMap[patientId]) > appointmentDate)) {
+          appointmentMap[patientId] = appointment.appointment_datetime;
+        }
+
+        // Track the most recent past appointment as the last visit
+        if (appointmentDate < now &&
+            (!lastVisitMap[patientId] ||
+             new Date(lastVisitMap[patientId]) < appointmentDate)) {
+          lastVisitMap[patientId] = appointment.appointment_datetime;
+        }
+      });
+
+      // Update patients with appointment information
+      setPatientAppointments(appointmentMap);
+
+      // Update patients with last visit information
+      setPatients(prevPatients =>
+        prevPatients.map(patient => ({
+          ...patient,
+          lastVisit: lastVisitMap[patient.id] || undefined,
+          upcomingAppointment: appointmentMap[patient.id] || null
+        }))
+      );
+
+      // Also update filtered patients
+      setFilteredPatients(prevPatients =>
+        prevPatients.map(patient => ({
+          ...patient,
+          lastVisit: lastVisitMap[patient.id] || undefined,
+          upcomingAppointment: appointmentMap[patient.id] || null
+        }))
+      );
+    } catch (err) {
+      console.error('Error fetching patient appointments:', err);
+      // We don't set an error here as we still want to display the patients
+      // even if we couldn't fetch their appointments
+    }
+  };
 
   // Filter patients based on search term
   useEffect(() => {
@@ -161,17 +252,29 @@ const ProviderPatientsPage: React.FC = () => {
           </Card>
         </motion.div>
 
+        {error && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mb-6"
+          >
+            <Alert
+              variant="error"
+              message={error}
+              onClose={() => setError(null)}
+            />
+          </motion.div>
+        )}
+
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
         >
           {isLoading ? (
-            <div className="flex justify-center py-12">
-              <svg className="animate-spin h-8 w-8 text-primary-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-              </svg>
+            <div className="flex justify-center items-center py-12">
+              <Spinner size="lg" />
+              <span className="ml-3 text-gray-600">Loading patients...</span>
             </div>
           ) : filteredPatients.length === 0 ? (
             <Card>
@@ -236,12 +339,14 @@ const ProviderPatientsPage: React.FC = () => {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
                         <h4 className="text-sm font-medium text-gray-500">Last Visit</h4>
-                        <p className="mt-1 text-sm text-gray-900">{new Date(patient.lastVisit).toLocaleDateString()}</p>
+                        <p className="mt-1 text-sm text-gray-900">
+                          {patient.lastVisit ? formatDate(patient.lastVisit, 'date') : 'No previous visits'}
+                        </p>
                       </div>
                       <div>
                         <h4 className="text-sm font-medium text-gray-500">Upcoming Appointment</h4>
                         <p className="mt-1 text-sm text-gray-900">
-                          {patient.upcomingAppointment ? patient.upcomingAppointment : 'None scheduled'}
+                          {patient.upcomingAppointment ? formatDate(patient.upcomingAppointment, 'datetime') : 'None scheduled'}
                         </p>
                       </div>
                     </div>

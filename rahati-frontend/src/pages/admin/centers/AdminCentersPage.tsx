@@ -1,18 +1,38 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { MainLayout } from '../../../layouts';
-import { Card, Button, Input, Badge, Select } from '../../../components/ui';
+import { Card, Button, Input, Badge, Select, Alert } from '../../../components/ui';
 import { useAuth } from '../../../hooks';
 import { useCenterStore } from '../../../store/centerStore';
 import { motion } from 'framer-motion';
 import { Center } from '../../../types';
+import { useAuthStore } from '../../../store';
 
 const AdminCentersPage: React.FC = () => {
   const { user } = useAuth('Admin');
+  const authStore = useAuthStore();
+  const navigate = useNavigate();
   const { centers, fetchCenters, isLoading, error } = useCenterStore();
   const [filteredCenters, setFilteredCenters] = useState<Center[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
+  const [accessError, setAccessError] = useState<string | null>(null);
+
+  // Check if user has permission to access this page
+  const isSuperuser = authStore.user?.role === 'Superuser';
+
+  // Redirect to dashboard if not a superuser
+  useEffect(() => {
+    if (!isSuperuser) {
+      setAccessError('You do not have permission to access the Centers management page. Only Superusers can manage healthcare centers.');
+      // Redirect after showing the error message
+      const timer = setTimeout(() => {
+        navigate('/admin/dashboard');
+      }, 3000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [isSuperuser, navigate]);
 
   // Fetch centers data
   useEffect(() => {
@@ -22,13 +42,13 @@ const AdminCentersPage: React.FC = () => {
   // Filter centers based on search term and status
   useEffect(() => {
     let filtered = centers;
-    
+
     // Filter by status
     if (statusFilter !== 'all') {
       const isActive = statusFilter === 'active';
       filtered = filtered.filter(center => center.is_active === isActive);
     }
-    
+
     // Filter by search term
     if (searchTerm.trim() !== '') {
       const term = searchTerm.toLowerCase();
@@ -39,7 +59,7 @@ const AdminCentersPage: React.FC = () => {
           center.address.toLowerCase().includes(term)
       );
     }
-    
+
     setFilteredCenters(filtered);
   }, [searchTerm, statusFilter, centers]);
 
@@ -68,22 +88,38 @@ const AdminCentersPage: React.FC = () => {
                 Manage healthcare centers on the platform.
               </p>
             </div>
-            <div className="mt-4 md:mt-0">
-              <Button
-                as={Link}
-                to="/admin/centers/new"
-                variant="primary"
-                leftIcon={
-                  <svg className="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                  </svg>
-                }
-              >
-                Add New Center
-              </Button>
-            </div>
+            {isSuperuser && (
+              <div className="mt-4 md:mt-0">
+                <Button
+                  as={Link}
+                  to="/admin/centers/new"
+                  variant="primary"
+                  leftIcon={
+                    <svg className="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                    </svg>
+                  }
+                >
+                  Add New Center
+                </Button>
+              </div>
+            )}
           </div>
         </motion.div>
+
+        {accessError && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mb-6"
+          >
+            <Alert
+              variant="error"
+              message={accessError}
+              className="mb-6"
+            />
+          </motion.div>
+        )}
 
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -145,7 +181,7 @@ const AdminCentersPage: React.FC = () => {
                 <p className="mt-1 text-sm text-gray-500">
                   {searchTerm || statusFilter !== 'all' ? 'Try adjusting your filters.' : 'Add a new healthcare center to get started.'}
                 </p>
-                {!searchTerm && statusFilter === 'all' && (
+                {!searchTerm && statusFilter === 'all' && isSuperuser && (
                   <div className="mt-6">
                     <Button
                       as={Link}

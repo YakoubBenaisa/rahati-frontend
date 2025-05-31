@@ -23,26 +23,26 @@ const Card: React.FC<CardProps> = ({
   hoverable = false,
 }) => {
   // Base classes
-  const baseClasses = 'bg-[var(--color-bg-primary)] rounded-lg shadow-md overflow-hidden border border-[var(--color-border)]';
-
+  const baseClasses = 'bg-white rounded-lg shadow-md overflow-hidden';
+  
   // Hoverable classes
   const hoverableClasses = hoverable ? 'cursor-pointer transition-all duration-300 hover:shadow-lg' : '';
-
+  
   // Combine all classes
   const cardClasses = `
     ${baseClasses}
     ${hoverableClasses}
     ${className}
   `;
-
+  
   // Animation variants
   const cardVariants = {
     hidden: { opacity: 0, y: 20 },
     visible: { opacity: 1, y: 0, transition: { duration: 0.3 } },
   };
-
+  
   const CardComponent = animate ? motion.div : 'div';
-
+  
   return (
     <CardComponent
       className={cardClasses}
@@ -53,17 +53,17 @@ const Card: React.FC<CardProps> = ({
     >
       {(title || subtitle) && (
         <div className="px-6 pt-6 pb-4">
-          {title && <h3 className="text-lg font-semibold text-[var(--color-text-primary)]">{title}</h3>}
-          {subtitle && <p className="mt-1 text-sm text-[var(--color-text-secondary)]">{subtitle}</p>}
+          {title && <h3 className="text-lg font-semibold text-gray-900">{title}</h3>}
+          {subtitle && <p className="mt-1 text-sm text-gray-500">{subtitle}</p>}
         </div>
       )}
-
+      
       <div className={`px-6 py-4 ${!title && !subtitle ? 'pt-6' : ''}`}>
         {children}
       </div>
-
+      
       {footer && (
-        <div className="px-6 py-4 bg-[var(--color-bg-secondary)] border-t border-[var(--color-border)]">
+        <div className="px-6 py-4 bg-gray-50 border-t border-gray-100">
           {footer}
         </div>
       )}

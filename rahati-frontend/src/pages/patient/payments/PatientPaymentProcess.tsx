@@ -49,7 +49,7 @@ const PatientPaymentProcess: React.FC = () => {
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
-      currency: 'USD'
+      currency: 'dzd'
     }).format(amount);
   };
 

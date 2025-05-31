@@ -5,12 +5,11 @@ import { Card, Button, Input, Select, Textarea, Alert } from '../../../component
 import { useAuth } from '../../../hooks';
 import { useForm } from '../../../hooks';
 import { motion } from 'framer-motion';
-import { centersAPI, usersAPI, appointmentsAPI, serviceCapacityAPI } from '../../../services/api';
+import { centersAPI, serviceCapacityAPI } from '../../../services/api';
 import { useAppointmentStore } from '../../../store';
 
 interface BookAppointmentFormValues {
   center_id: string;
-  provider_id: string;
   appointment_date: string;
   appointment_time: string;
   reason: string;
@@ -23,7 +22,6 @@ const PatientBookAppointment: React.FC = () => {
   const { createAppointment } = useAppointmentStore();
   const [isLoading, setIsLoading] = useState(false);
   const [centers, setCenters] = useState<{ id: number; name: string }[]>([]);
-  const [providers, setProviders] = useState<{ id: number; name: string }[]>([]);
   const [availableTimes, setAvailableTimes] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
@@ -34,10 +32,6 @@ const PatientBookAppointment: React.FC = () => {
 
     if (!values.center_id) {
       errors.center_id = 'Please select a healthcare center';
-    }
-
-    if (!values.provider_id) {
-      errors.provider_id = 'Please select a healthcare provider';
     }
 
     if (!values.appointment_date) {
@@ -68,10 +62,10 @@ const PatientBookAppointment: React.FC = () => {
       const appointmentData = {
         patient_id: user?.id,
         center_id: Number(values.center_id),
-        provider_id: Number(values.provider_id),
+        // Provider will be assigned by the center admin
         appointment_datetime: appointmentDatetime,
         appointment_duration: 30, // Default to 30 minutes
-        status: 'scheduled',
+        status: 'pending', // Set as pending until a provider is assigned
         reason: values.reason,
         notes: values.notes
       };
@@ -79,7 +73,10 @@ const PatientBookAppointment: React.FC = () => {
       // Call the API to create the appointment
       await createAppointment(appointmentData);
 
-      setSuccess('Appointment booked successfully');
+      setSuccess('Appointment request submitted successfully. A healthcare provider will be assigned to your appointment.');
+
+      // Reset form
+      resetForm();
 
       // Redirect to appointments list after 2 seconds
       setTimeout(() => {
@@ -97,7 +94,6 @@ const PatientBookAppointment: React.FC = () => {
   const { values, errors, touched, handleChange, handleBlur, handleSubmit: submitForm, isSubmitting } = useForm<BookAppointmentFormValues>(
     {
       center_id: '',
-      provider_id: '',
       appointment_date: '',
       appointment_time: '',
       reason: '',
@@ -129,61 +125,25 @@ const PatientBookAppointment: React.FC = () => {
     fetchCenters();
   }, []);
 
-  // Fetch providers data when center changes
-  useEffect(() => {
-    if (values.center_id) {
-      const fetchProviders = async () => {
-        setProviders([]);
-        setIsLoading(true);
-        try {
-          const response = await usersAPI.getUsers({
-            role: 'Provider',
-            center_id: values.center_id,
-            is_active: true
-          });
-          const providersData = response.data.data || response.data;
-          setProviders(providersData.map((provider: any) => ({
-            id: provider.id,
-            name: provider.name
-          })));
-        } catch (err: any) {
-          console.error('Error fetching providers:', err);
-          setError('Failed to load healthcare providers. Please try again.');
-        } finally {
-          setIsLoading(false);
-        }
-      };
+  // We don't need to fetch providers as they will be assigned by the center admin
 
-      fetchProviders();
-    }
-  }, [values.center_id]);
-
-  // Fetch available times when provider and date change
+  // Fetch available times when center and date change
   useEffect(() => {
-    if (values.provider_id && values.appointment_date) {
+    if (values.center_id && values.appointment_date) {
       const fetchAvailableTimes = async () => {
         setAvailableTimes([]);
         setIsLoading(true);
         try {
-          // Get service capacity for the selected date and provider
+          // Get service capacity for the selected date and center
           const response = await serviceCapacityAPI.getServiceCapacities({
-            provider_id: values.provider_id,
+            center_id: values.center_id,
             date: values.appointment_date,
             service_type: 'appointment'
           });
 
           const capacityData = response.data.data || response.data;
 
-          // Get existing appointments for the provider on the selected date
-          const appointmentsResponse = await appointmentsAPI.getAppointments({
-            provider_id: values.provider_id,
-            date: values.appointment_date,
-            status: 'scheduled'
-          });
-
-          const bookedAppointments = appointmentsResponse.data.data || appointmentsResponse.data;
-
-          // Generate available time slots based on capacity and booked appointments
+          // Generate available time slots based on capacity
           // This is a simplified example - in a real app, you'd need more complex logic
           const timeSlots = [];
           if (capacityData.length > 0) {
@@ -194,17 +154,7 @@ const PatientBookAppointment: React.FC = () => {
             // Generate 30-minute slots
             for (let time = startTime; time < endTime; time.setMinutes(time.getMinutes() + 30)) {
               const timeString = time.toTimeString().substring(0, 5);
-
-              // Check if this time slot is already booked
-              const isBooked = bookedAppointments.some((appointment: any) => {
-                const appointmentTime = new Date(appointment.appointment_datetime)
-                  .toTimeString().substring(0, 5);
-                return appointmentTime === timeString;
-              });
-
-              if (!isBooked) {
-                timeSlots.push(timeString);
-              }
+              timeSlots.push(timeString);
             }
           } else {
             // If no specific capacity data, use default business hours
@@ -213,18 +163,7 @@ const PatientBookAppointment: React.FC = () => {
               '13:00', '13:30', '14:00', '14:30', '15:00', '15:30'
             ];
 
-            // Filter out already booked times
-            for (const time of defaultTimes) {
-              const isBooked = bookedAppointments.some((appointment: any) => {
-                const appointmentTime = new Date(appointment.appointment_datetime)
-                  .toTimeString().substring(0, 5);
-                return appointmentTime === time;
-              });
-
-              if (!isBooked) {
-                timeSlots.push(time);
-              }
-            }
+            timeSlots.push(...defaultTimes);
           }
 
           setAvailableTimes(timeSlots);
@@ -238,7 +177,7 @@ const PatientBookAppointment: React.FC = () => {
 
       fetchAvailableTimes();
     }
-  }, [values.provider_id, values.appointment_date]);
+  }, [values.center_id, values.appointment_date]);
 
   // Get tomorrow's date as the minimum date for appointment
   const getTomorrowDate = () => {
@@ -321,31 +260,26 @@ const PatientBookAppointment: React.FC = () => {
                         label: center.name
                       }))
                     ]}
-                    error={touched.center_id && errors.center_id}
+                    error={touched.center_id ? errors.center_id : undefined}
                     disabled={isLoading}
                   />
                 </div>
 
                 <div>
-                  <label htmlFor="provider_id" className="block text-sm font-medium text-gray-700 mb-1">
-                    Healthcare Provider *
-                  </label>
-                  <Select
-                    id="provider_id"
-                    name="provider_id"
-                    value={values.provider_id}
-                    onChange={handleChange}
-                    onBlur={handleBlur}
-                    options={[
-                      { value: '', label: values.center_id ? 'Select a provider' : 'Please select a center first' },
-                      ...providers.map(provider => ({
-                        value: provider.id.toString(),
-                        label: provider.name
-                      }))
-                    ]}
-                    error={touched.provider_id && errors.provider_id}
-                    disabled={!values.center_id || isLoading}
-                  />
+                  <div className="bg-blue-50 border-l-4 border-blue-400 p-4 mb-4">
+                    <div className="flex">
+                      <div className="flex-shrink-0">
+                        <svg className="h-5 w-5 text-blue-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                          <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                        </svg>
+                      </div>
+                      <div className="ml-3">
+                        <p className="text-sm text-blue-700">
+                          A healthcare provider will be assigned to your appointment by the center administrator.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -361,8 +295,8 @@ const PatientBookAppointment: React.FC = () => {
                       onChange={handleChange}
                       onBlur={handleBlur}
                       min={getTomorrowDate()}
-                      error={touched.appointment_date && errors.appointment_date}
-                      disabled={!values.provider_id || isLoading}
+                      error={touched.appointment_date ? errors.appointment_date : undefined}
+                      disabled={!values.center_id || isLoading}
                     />
                   </div>
 
@@ -383,7 +317,7 @@ const PatientBookAppointment: React.FC = () => {
                           label: time
                         }))
                       ]}
-                      error={touched.appointment_time && errors.appointment_time}
+                      error={touched.appointment_time ? errors.appointment_time : undefined}
                       disabled={!values.appointment_date || isLoading}
                     />
                   </div>
@@ -400,7 +334,7 @@ const PatientBookAppointment: React.FC = () => {
                     onChange={handleChange}
                     onBlur={handleBlur}
                     placeholder="Enter the reason for your appointment"
-                    error={touched.reason && errors.reason}
+                    error={touched.reason ? errors.reason : undefined}
                   />
                 </div>
 
@@ -416,7 +350,7 @@ const PatientBookAppointment: React.FC = () => {
                     onBlur={handleBlur}
                     placeholder="Enter any additional information that might be helpful for the provider"
                     rows={4}
-                    error={touched.notes && errors.notes}
+                    error={touched.notes ? errors.notes : undefined}
                   />
                 </div>
 

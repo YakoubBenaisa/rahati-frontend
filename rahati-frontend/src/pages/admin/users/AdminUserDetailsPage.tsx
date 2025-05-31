@@ -1,21 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import { MainLayout } from '../../../layouts';
-import { Card, Button, Badge, Alert, Tabs, Tab } from '../../../components/ui';
+import { Card, Button, Badge, Alert, Tabs, Tab, Spinner } from '../../../components/ui';
 import { useAuth } from '../../../hooks';
 import { motion } from 'framer-motion';
+import { usersAPI, centersAPI, appointmentsAPI } from '../../../services/api';
+import { formatDate } from '../../../utils/dateUtils';
+import { User, Center } from '../../../types';
 
-interface UserDetails {
-  id: number;
-  name: string;
-  email: string;
-  role: 'Patient' | 'Provider' | 'Admin';
-  phone: string;
-  address: string;
-  status: 'active' | 'inactive';
-  createdAt: string;
-  updatedAt: string;
-  lastLogin: string;
+interface UserDetails extends User {
+  center_name?: string;
+  is_active?: boolean;
+  created_at: string;
+  updated_at: string;
+  last_login?: string;
 }
 
 interface Appointment {
@@ -47,132 +45,144 @@ const AdminUserDetailsPage: React.FC = () => {
   const [success, setSuccess] = useState<string | null>(null);
   const [isDeactivating, setIsDeactivating] = useState(false);
 
-  // Mock fetch user data
+  // Fetch centers for reference
+  const [centers, setCenters] = useState<Center[]>([]);
+
   useEffect(() => {
-    setIsLoading(true);
-    // Simulate API call
-    setTimeout(() => {
-      // Mock user data
-      const mockUser: UserDetails = {
-        id: Number(id),
-        name: 'John Doe',
-        email: 'john.doe@example.com',
-        role: 'Patient',
-        phone: '(555) 123-4567',
-        address: '123 Main St, Anytown, CA 12345',
-        status: 'active',
-        createdAt: '2023-01-15T10:30:00Z',
-        updatedAt: '2023-05-20T14:45:00Z',
-        lastLogin: '2023-06-01T09:15:00Z'
-      };
+    const fetchCenters = async () => {
+      try {
+        const response = await centersAPI.getCenters();
+        setCenters(response.data.data || response.data);
+      } catch (err) {
+        console.error('Error fetching centers:', err);
+      }
+    };
 
-      // Mock appointments
-      const mockAppointments: Appointment[] = [
-        {
-          id: 101,
-          date: '2023-05-15',
-          time: '10:00 AM',
-          provider: 'Dr. Smith',
-          center: 'Main Medical Center',
-          status: 'completed'
-        },
-        {
-          id: 102,
-          date: '2023-06-10',
-          time: '2:30 PM',
-          provider: 'Dr. Johnson',
-          center: 'Main Medical Center',
-          status: 'scheduled'
-        },
-        {
-          id: 103,
-          date: '2023-04-02',
-          time: '11:15 AM',
-          provider: 'Dr. Smith',
-          center: 'Downtown Clinic',
-          status: 'completed'
+    fetchCenters();
+  }, []);
+
+  // Get center name by ID
+  const getCenterName = (centerId?: number) => {
+    if (!centerId) return 'N/A';
+    const center = centers.find(c => c.id === centerId);
+    return center ? center.name : `Center #${centerId}`;
+  };
+
+  // Fetch user data from API
+  useEffect(() => {
+    const fetchUserData = async () => {
+      setIsLoading(true);
+      setError(null);
+
+      try {
+        // Fetch user details
+        const userResponse = await usersAPI.getUserById(Number(id));
+        const userData = userResponse.data.data || userResponse.data;
+
+        // Add center name to user data
+        const userWithCenter = {
+          ...userData,
+          center_name: getCenterName(userData.center_id)
+        };
+
+        setUserDetails(userWithCenter);
+
+        // Fetch user's appointments if they are a patient
+        if (userData.role === 'Patient') {
+          try {
+            const appointmentsResponse = await appointmentsAPI.getAppointments({
+              patient_id: userData.id
+            });
+
+            const appointmentsData = appointmentsResponse.data.data || appointmentsResponse.data;
+            setAppointments(appointmentsData.map((apt: any) => ({
+              id: apt.id,
+              date: apt.appointment_datetime ? apt.appointment_datetime.split('T')[0] : '',
+              time: apt.appointment_datetime ? formatDate(apt.appointment_datetime, 'time') : '',
+              provider: apt.provider_name || 'Not assigned',
+              center: getCenterName(apt.center_id),
+              status: apt.status
+            })));
+          } catch (err) {
+            console.error('Error fetching appointments:', err);
+            // Don't fail the whole page if appointments can't be loaded
+            setAppointments([]);
+          }
         }
-      ];
 
-      // Mock activity logs
-      const mockActivityLogs: ActivityLog[] = [
-        {
-          id: 201,
-          action: 'Login',
-          timestamp: '2023-06-01T09:15:00Z',
-          details: 'User logged in from IP 192.168.1.1'
-        },
-        {
-          id: 202,
-          action: 'Profile Update',
-          timestamp: '2023-05-20T14:45:00Z',
-          details: 'User updated their profile information'
-        },
-        {
-          id: 203,
-          action: 'Appointment Booking',
-          timestamp: '2023-05-10T11:30:00Z',
-          details: 'User booked an appointment with Dr. Johnson'
-        },
-        {
-          id: 204,
-          action: 'Password Change',
-          timestamp: '2023-04-15T16:20:00Z',
-          details: 'User changed their password'
-        },
-        {
-          id: 205,
-          action: 'Registration',
-          timestamp: '2023-01-15T10:30:00Z',
-          details: 'User registered an account'
-        }
-      ];
+        // For now, we'll use empty activity logs since the API might not provide this
+        setActivityLogs([]);
 
-      setUserDetails(mockUser);
-      setAppointments(mockAppointments);
-      setActivityLogs(mockActivityLogs);
-      setIsLoading(false);
-    }, 1000);
+      } catch (err: any) {
+        console.error('Error fetching user details:', err);
+        setError(err.response?.data?.message || 'Failed to load user details. Please try again.');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    if (id) {
+      fetchUserData();
+    }
   }, [id]);
 
-  // Handle user deactivation
-  const handleDeactivateUser = () => {
+  // Handle user activation/deactivation
+  const handleDeactivateUser = async () => {
     if (!userDetails) return;
-    
+
     setIsDeactivating(true);
-    
-    // Simulate API call
-    setTimeout(() => {
-      // Update user status
+    setError(null);
+
+    try {
+      // Determine the new status
+      const newStatus = userDetails.is_active ? false : true;
+
+      // Call API to update user status
+      await usersAPI.updateUser(userDetails.id, {
+        is_active: newStatus
+      });
+
+      // Update local state
       setUserDetails({
         ...userDetails,
-        status: userDetails.status === 'active' ? 'inactive' : 'active'
+        is_active: newStatus
       });
-      
-      setSuccess(`User ${userDetails.status === 'active' ? 'deactivated' : 'activated'} successfully`);
-      setIsDeactivating(false);
-      
+
+      setSuccess(`User ${newStatus ? 'activated' : 'deactivated'} successfully`);
+
       // Clear success message after 3 seconds
       setTimeout(() => setSuccess(null), 3000);
-    }, 1000);
+    } catch (err: any) {
+      console.error('Error updating user status:', err);
+      setError(err.response?.data?.message || 'Failed to update user status. Please try again.');
+    } finally {
+      setIsDeactivating(false);
+    }
   };
 
   // Handle user deletion
-  const handleDeleteUser = () => {
+  const handleDeleteUser = async () => {
     if (!userDetails) return;
-    
+
     if (window.confirm(`Are you sure you want to delete the user ${userDetails.name}? This action cannot be undone.`)) {
       setIsLoading(true);
-      
-      // Simulate API call
-      setTimeout(() => {
+      setError(null);
+
+      try {
+        // Call API to delete user
+        await usersAPI.deleteUser(userDetails.id);
+
         setSuccess('User deleted successfully');
-        
+
         // Redirect to users list after 2 seconds
         setTimeout(() => {
           navigate('/admin/users');
         }, 2000);
-      }, 1000);
+      } catch (err: any) {
+        console.error('Error deleting user:', err);
+        setError(err.response?.data?.message || 'Failed to delete user. Please try again.');
+        setIsLoading(false);
+      }
     }
   };
 
@@ -242,10 +252,10 @@ const AdminUserDetailsPage: React.FC = () => {
               </Button>
               <h1 className="text-3xl font-bold text-gray-900">{userDetails.name}</h1>
               <Badge
-                variant={userDetails.status === 'active' ? 'success' : 'danger'}
+                variant={userDetails.is_active ? 'success' : 'danger'}
                 className="ml-4"
               >
-                {userDetails.status === 'active' ? 'Active' : 'Inactive'}
+                {userDetails.is_active ? 'Active' : 'Inactive'}
               </Badge>
             </div>
             <div className="mt-4 md:mt-0 flex space-x-3">
@@ -263,10 +273,10 @@ const AdminUserDetailsPage: React.FC = () => {
               </Button>
               <Button
                 onClick={handleDeactivateUser}
-                variant={userDetails.status === 'active' ? 'danger' : 'success'}
+                variant={userDetails.is_active ? 'danger' : 'success'}
                 isLoading={isDeactivating}
               >
-                {userDetails.status === 'active' ? 'Deactivate' : 'Activate'}
+                {userDetails.is_active ? 'Deactivate' : 'Activate'}
               </Button>
             </div>
           </div>
@@ -311,6 +321,7 @@ const AdminUserDetailsPage: React.FC = () => {
                         <p className="mt-1">
                           <Badge
                             variant={
+                              userDetails.role === 'Superuser' ? 'danger' :
                               userDetails.role === 'Admin' ? 'primary' :
                               userDetails.role === 'Provider' ? 'secondary' :
                               'info'
@@ -328,6 +339,18 @@ const AdminUserDetailsPage: React.FC = () => {
                         <span className="text-sm font-medium text-gray-500">Address:</span>
                         <p className="mt-1">{userDetails.address || 'Not provided'}</p>
                       </div>
+                      {(userDetails.role === 'Admin' || userDetails.role === 'Provider') && (
+                        <div>
+                          <span className="text-sm font-medium text-gray-500">Healthcare Center:</span>
+                          <p className="mt-1">{userDetails.center_name || 'Not assigned'}</p>
+                        </div>
+                      )}
+                      {userDetails.role === 'Patient' && userDetails.caregiver_name && (
+                        <div>
+                          <span className="text-sm font-medium text-gray-500">Caregiver:</span>
+                          <p className="mt-1">{userDetails.caregiver_name} {userDetails.caregiver_phone ? `(${userDetails.caregiver_phone})` : ''}</p>
+                        </div>
+                      )}
                     </div>
                   </div>
                   <div>
@@ -337,28 +360,28 @@ const AdminUserDetailsPage: React.FC = () => {
                         <span className="text-sm font-medium text-gray-500">Account Status:</span>
                         <p className="mt-1">
                           <Badge
-                            variant={userDetails.status === 'active' ? 'success' : 'danger'}
+                            variant={userDetails.is_active ? 'success' : 'danger'}
                           >
-                            {userDetails.status === 'active' ? 'Active' : 'Inactive'}
+                            {userDetails.is_active ? 'Active' : 'Inactive'}
                           </Badge>
                         </p>
                       </div>
                       <div>
                         <span className="text-sm font-medium text-gray-500">Created At:</span>
-                        <p className="mt-1">{new Date(userDetails.createdAt).toLocaleString()}</p>
+                        <p className="mt-1">{formatDate(userDetails.created_at, 'datetime')}</p>
                       </div>
                       <div>
                         <span className="text-sm font-medium text-gray-500">Last Updated:</span>
-                        <p className="mt-1">{new Date(userDetails.updatedAt).toLocaleString()}</p>
+                        <p className="mt-1">{formatDate(userDetails.updated_at, 'datetime')}</p>
                       </div>
                       <div>
                         <span className="text-sm font-medium text-gray-500">Last Login:</span>
-                        <p className="mt-1">{new Date(userDetails.lastLogin).toLocaleString()}</p>
+                        <p className="mt-1">{userDetails.last_login ? formatDate(userDetails.last_login, 'datetime') : 'Never'}</p>
                       </div>
                     </div>
                   </div>
                 </div>
-                
+
                 <div className="mt-8 pt-6 border-t border-gray-200">
                   <h3 className="text-lg font-medium text-gray-900 mb-4">Danger Zone</h3>
                   <div className="bg-red-50 border border-red-200 rounded-md p-4">
@@ -404,7 +427,7 @@ const AdminUserDetailsPage: React.FC = () => {
                       </Button>
                     )}
                   </div>
-                  
+
                   {appointments.length === 0 ? (
                     <div className="text-center py-6">
                       <svg className="mx-auto h-12 w-12 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -422,8 +445,8 @@ const AdminUserDetailsPage: React.FC = () => {
                               <div>
                                 <div className="flex items-center">
                                   <div className={`flex-shrink-0 h-10 w-10 rounded-full flex items-center justify-center ${
-                                    appointment.status === 'completed' 
-                                      ? 'bg-green-100 text-green-600' 
+                                    appointment.status === 'completed'
+                                      ? 'bg-green-100 text-green-600'
                                       : appointment.status === 'scheduled'
                                       ? 'bg-blue-100 text-blue-600'
                                       : 'bg-red-100 text-red-600'
@@ -473,7 +496,7 @@ const AdminUserDetailsPage: React.FC = () => {
               <Tab id="activity" label="Activity Log">
                 <div>
                   <h3 className="text-lg font-medium text-gray-900 mb-4">User Activity</h3>
-                  
+
                   {activityLogs.length === 0 ? (
                     <div className="text-center py-6">
                       <svg className="mx-auto h-12 w-12 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">

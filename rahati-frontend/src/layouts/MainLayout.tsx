@@ -59,12 +59,22 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
     } else if (user?.role === 'Provider') {
       roleBasedItems.push(
         { name: 'My Schedule', path: '/provider/schedule' },
+        { name: 'My Appointments', path: '/provider/appointments' },
         { name: 'Consultations', path: '/provider/consultations' },
         { name: 'Patients', path: '/provider/patients' },
       );
     } else if (user?.role === 'Admin') {
+      // Admin users can only manage users, appointments, and rooms
       roleBasedItems.push(
         { name: 'Dashboard', path: '/admin/dashboard' },
+        { name: 'Users', path: '/admin/users' },
+        { name: 'Appointments', path: '/admin/appointments' },
+        { name: 'Rooms', path: '/admin/rooms' },
+      );
+    } else if (user?.role === 'Superuser') {
+      // Superusers can manage everything
+      roleBasedItems.push(
+        { name: 'Dashboard', path: '/superuser/dashboard' },
         { name: 'Users', path: '/admin/users' },
         { name: 'Centers', path: '/admin/centers' },
         { name: 'Appointments', path: '/admin/appointments' },
@@ -425,9 +435,9 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                     Manage Schedule
                   </Link>
                 )}
-                {user?.role === 'Admin' && (
+                {(user?.role === 'Admin' || user?.role === 'Superuser') && (
                   <Link
-                    to="/admin/users/create"
+                    to="/admin/users/new"
                     className="inline-flex items-center px-3 py-1.5 text-sm font-medium rounded-md text-[var(--color-secondary-700)] bg-[var(--color-secondary-100)] hover:bg-[var(--color-secondary-200)]"
                   >
                     <svg className="h-4 w-4 mr-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">

@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import { MainLayout } from '../../../layouts';
-import { Card, Button, Badge } from '../../../components/ui';
+import { Card, Button, Badge, Alert } from '../../../components/ui';
 import { useAuth } from '../../../hooks';
 import { motion } from 'framer-motion';
+import { consultationsAPI } from '../../../services/api';
 
 interface ConsultationDetails {
   id: number;
@@ -40,51 +41,61 @@ const PatientConsultationDetails: React.FC = () => {
   const { user } = useAuth('Patient');
   const [isLoading, setIsLoading] = useState(true);
   const [consultation, setConsultation] = useState<ConsultationDetails | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
-  // Mock fetch consultation data
+  // Fetch consultation data from API
   useEffect(() => {
-    setIsLoading(true);
-    // Simulate API call
-    setTimeout(() => {
-      // Mock consultation data
-      const mockConsultation: ConsultationDetails = {
-        id: Number(id),
-        date: '2023-05-15',
-        time: '10:00 AM',
-        provider: {
-          id: 1,
-          name: 'Dr. John Smith',
-          specialty: 'General Practitioner',
-          imageUrl: 'https://randomuser.me/api/portraits/men/75.jpg'
-        },
-        center: {
-          id: 1,
-          name: 'Main Medical Center',
-          address: '123 Main St, Anytown, CA 12345'
-        },
-        status: 'completed',
-        diagnosis: 'Common cold',
-        symptoms: ['Runny nose', 'Sore throat', 'Cough', 'Mild fever'],
-        treatmentPlan: 'Rest, hydration, and over-the-counter medications for symptom relief.',
-        medications: [
-          {
-            name: 'Acetaminophen',
-            dosage: '500mg',
-            instructions: 'Take 1 tablet every 6 hours as needed for fever or pain.'
+    const fetchConsultationDetails = async () => {
+      if (!id) return;
+
+      setIsLoading(true);
+      setError(null);
+
+      try {
+        const response = await consultationsAPI.getConsultationById(parseInt(id));
+        const data = response.data.data || response.data;
+
+        // Transform API data to match our interface
+        const formattedData: ConsultationDetails = {
+          id: data.id,
+          date: data.date,
+          time: data.time || '12:00',
+          provider: {
+            id: data.provider?.id || 0,
+            name: data.provider?.name || 'Unknown Provider',
+            specialty: data.provider?.specialty || 'General',
+            imageUrl: data.provider?.image_url
           },
-          {
-            name: 'Dextromethorphan',
-            dosage: '30mg',
-            instructions: 'Take 1 dose every 6-8 hours as needed for cough.'
-          }
-        ],
-        followUpRequired: false,
-        notes: 'Patient should recover within 7-10 days. If symptoms worsen or do not improve after 10 days, please schedule a follow-up appointment.'
-      };
-      
-      setConsultation(mockConsultation);
-      setIsLoading(false);
-    }, 1000);
+          center: {
+            id: data.center?.id || 0,
+            name: data.center?.name || 'Unknown Center',
+            address: data.center?.address || 'No address available'
+          },
+          status: data.status || 'active',
+          diagnosis: data.diagnosis,
+          symptoms: data.symptoms || [],
+          treatmentPlan: data.treatment_plan,
+          medications: data.medications?.map((med: any) => ({
+            name: med.name,
+            dosage: med.dosage,
+            instructions: med.instructions
+          })) || [],
+          followUpRequired: data.follow_up_required || false,
+          followUpDate: data.follow_up_date,
+          notes: data.notes
+        };
+
+        setConsultation(formattedData);
+      } catch (err: any) {
+        console.error('Error fetching consultation details:', err);
+        setError(err.response?.data?.message || 'Failed to load consultation details. Please try again.');
+        setConsultation(null);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchConsultationDetails();
   }, [id]);
 
   if (isLoading) {
@@ -106,6 +117,12 @@ const PatientConsultationDetails: React.FC = () => {
     return (
       <MainLayout>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          {error && (
+            <Alert variant="error" className="mb-6" dismissible onDismiss={() => setError(null)}>
+              {error}
+            </Alert>
+          )}
+
           <Card>
             <div className="text-center py-8">
               <svg className="mx-auto h-12 w-12 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -209,13 +226,13 @@ const PatientConsultationDetails: React.FC = () => {
                   <p className="text-sm text-gray-500">{consultation.provider.specialty}</p>
                 </div>
               </div>
-              
+
               <div className="mt-4">
                 <h4 className="text-sm font-medium text-gray-500">Healthcare Center</h4>
                 <p className="mt-1 text-sm text-gray-900">{consultation.center.name}</p>
                 <p className="text-sm text-gray-500">{consultation.center.address}</p>
               </div>
-              
+
               <div className="mt-6 pt-4 border-t border-gray-200">
                 <Button
                   as={Link}
@@ -244,7 +261,7 @@ const PatientConsultationDetails: React.FC = () => {
                     <p className="text-gray-700">{consultation.diagnosis}</p>
                   </div>
                 )}
-                
+
                 <div>
                   <h3 className="text-lg font-medium text-gray-900 mb-2">Symptoms</h3>
                   <div className="flex flex-wrap gap-2">
@@ -253,14 +270,14 @@ const PatientConsultationDetails: React.FC = () => {
                     ))}
                   </div>
                 </div>
-                
+
                 {consultation.treatmentPlan && (
                   <div>
                     <h3 className="text-lg font-medium text-gray-900 mb-2">Treatment Plan</h3>
                     <p className="text-gray-700">{consultation.treatmentPlan}</p>
                   </div>
                 )}
-                
+
                 {consultation.medications.length > 0 && (
                   <div>
                     <h3 className="text-lg font-medium text-gray-900 mb-2">Medications</h3>
@@ -274,13 +291,13 @@ const PatientConsultationDetails: React.FC = () => {
                     </div>
                   </div>
                 )}
-                
+
                 {consultation.followUpRequired && (
                   <div>
                     <h3 className="text-lg font-medium text-gray-900 mb-2">Follow-Up</h3>
                     <p className="text-gray-700">
-                      {consultation.followUpDate 
-                        ? `Follow-up appointment recommended by ${new Date(consultation.followUpDate).toLocaleDateString()}.` 
+                      {consultation.followUpDate
+                        ? `Follow-up appointment recommended by ${new Date(consultation.followUpDate).toLocaleDateString()}.`
                         : 'Follow-up appointment recommended.'}
                     </p>
                     {consultation.followUpDate && (
@@ -297,7 +314,7 @@ const PatientConsultationDetails: React.FC = () => {
                     )}
                   </div>
                 )}
-                
+
                 {consultation.notes && (
                   <div>
                     <h3 className="text-lg font-medium text-gray-900 mb-2">Additional Notes</h3>

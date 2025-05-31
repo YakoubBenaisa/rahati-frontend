@@ -1,17 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { MainLayout } from '../../../layouts';
-import { Card, Button, Input, Badge, Select } from '../../../components/ui';
+import { Card, Button, Input, Badge, Select, Spinner, Alert } from '../../../components/ui';
 import { useAuth } from '../../../hooks';
 import { motion } from 'framer-motion';
+import { consultationsAPI } from '../../../services/api';
+import { formatDate } from '../../../utils/dateUtils';
+import { Consultation as ApiConsultation, ConsultationStatus } from '../../../types';
 
-interface Consultation {
+// Define a local interface that matches our UI needs
+interface ConsultationUI {
   id: number;
   patientName: string;
   patientId: number;
   date: string;
   time: string;
-  status: 'active' | 'completed' | 'cancelled';
+  status: ConsultationStatus;
   type: string;
   diagnosis?: string;
   followUpRequired: boolean;
@@ -20,85 +24,75 @@ interface Consultation {
 const ProviderConsultationsPage: React.FC = () => {
   const { user } = useAuth('Provider');
   const [isLoading, setIsLoading] = useState(false);
-  const [consultations, setConsultations] = useState<Consultation[]>([]);
-  const [filteredConsultations, setFilteredConsultations] = useState<Consultation[]>([]);
+  const [error, setError] = useState<string | null>(null);
+  const [consultations, setConsultations] = useState<ConsultationUI[]>([]);
+  const [filteredConsultations, setFilteredConsultations] = useState<ConsultationUI[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
 
-  // Mock fetch consultations data
+  // Fetch consultations data from API
   useEffect(() => {
-    setIsLoading(true);
-    // Simulate API call
-    setTimeout(() => {
-      const mockConsultations: Consultation[] = [
-        {
-          id: 1,
-          patientName: 'John Doe',
-          patientId: 1,
-          date: '2023-05-15',
-          time: '10:00 AM',
-          status: 'completed',
-          type: 'Initial Consultation',
-          diagnosis: 'Hypertension',
-          followUpRequired: true
-        },
-        {
-          id: 2,
-          patientName: 'Jane Smith',
-          patientId: 2,
-          date: '2023-05-20',
-          time: '2:30 PM',
-          status: 'completed',
-          type: 'Follow-up',
-          diagnosis: 'Asthma',
-          followUpRequired: true
-        },
-        {
-          id: 3,
-          patientName: 'Robert Johnson',
-          patientId: 3,
-          date: '2023-06-05',
-          time: '11:15 AM',
-          status: 'active',
-          type: 'Initial Consultation',
-          followUpRequired: false
-        },
-        {
-          id: 4,
-          patientName: 'Emily Davis',
-          patientId: 4,
-          date: '2023-06-10',
-          time: '9:00 AM',
-          status: 'active',
-          type: 'Follow-up',
-          followUpRequired: false
-        },
-        {
-          id: 5,
-          patientName: 'Michael Wilson',
-          patientId: 5,
-          date: '2023-05-10',
-          time: '3:45 PM',
-          status: 'cancelled',
-          type: 'Initial Consultation',
-          followUpRequired: false
-        }
-      ];
-      setConsultations(mockConsultations);
-      setFilteredConsultations(mockConsultations);
-      setIsLoading(false);
-    }, 1000);
-  }, []);
+    if (!user?.id) return;
+
+    const fetchConsultations = async () => {
+      setIsLoading(true);
+      setError(null);
+
+      try {
+        // Get consultations for the provider
+        const response = await consultationsAPI.getConsultations({
+          provider_id: user.id
+        });
+
+        const consultationsData = response.data.data || response.data;
+
+        // Transform API data to our UI format
+        const transformedConsultations: ConsultationUI[] = consultationsData.map((consultation: ApiConsultation) => {
+          // Extract date and time from appointment_datetime
+          const dateTime = new Date(consultation.start_time);
+          const date = dateTime.toISOString().split('T')[0];
+          const time = dateTime.toTimeString().split(' ')[0].substring(0, 5);
+
+          // Get patient info from appointment
+          const patient = consultation.appointment?.patient;
+
+          return {
+            id: consultation.id,
+            patientName: patient?.name || 'Unknown Patient',
+            patientId: patient?.id || 0,
+            date,
+            time,
+            status: consultation.status,
+            type: consultation.appointment?.appointment_type || 'Consultation',
+            diagnosis: consultation.diagnosis || undefined,
+            followUpRequired: consultation.follow_up_required || false
+          };
+        });
+
+        setConsultations(transformedConsultations);
+        setFilteredConsultations(transformedConsultations);
+      } catch (err: any) {
+        console.error('Error fetching consultations:', err);
+        setError(err.response?.data?.message || 'Failed to load consultations. Please try again.');
+        setConsultations([]);
+        setFilteredConsultations([]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchConsultations();
+  }, [user]);
 
   // Filter consultations based on search term and status
   useEffect(() => {
     let filtered = consultations;
-    
+
     // Filter by status
     if (statusFilter !== 'all') {
       filtered = filtered.filter(consultation => consultation.status === statusFilter);
     }
-    
+
     // Filter by search term
     if (searchTerm.trim() !== '') {
       const term = searchTerm.toLowerCase();
@@ -109,7 +103,7 @@ const ProviderConsultationsPage: React.FC = () => {
           (consultation.diagnosis && consultation.diagnosis.toLowerCase().includes(term))
       );
     }
-    
+
     setFilteredConsultations(filtered);
   }, [searchTerm, statusFilter, consultations]);
 
@@ -226,8 +220,8 @@ const ProviderConsultationsPage: React.FC = () => {
                     <div className="flex items-center">
                       <div className="flex-shrink-0">
                         <div className={`h-12 w-12 rounded-full flex items-center justify-center text-lg font-semibold ${
-                          consultation.status === 'active' 
-                            ? 'bg-blue-100 text-blue-600' 
+                          consultation.status === 'active'
+                            ? 'bg-blue-100 text-blue-600'
                             : consultation.status === 'completed'
                             ? 'bg-green-100 text-green-600'
                             : 'bg-red-100 text-red-600'

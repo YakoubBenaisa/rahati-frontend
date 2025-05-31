@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { MainLayout } from '../../../layouts';
-import { Card, Button, Badge, Input, Select } from '../../../components/ui';
+import { Card, Button, Badge, Input, Select, Alert } from '../../../components/ui';
 import { useAuth } from '../../../hooks';
 import { motion } from 'framer-motion';
+import { accommodationsAPI } from '../../../services/api';
 
 interface Accommodation {
   id: number;
@@ -24,68 +25,54 @@ const PatientAccommodations: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
 
-  // Mock fetch accommodations data
+  // Fetch accommodations data from API
+  const [error, setError] = useState<string | null>(null);
+
   useEffect(() => {
-    setIsLoading(true);
-    // Simulate API call
-    setTimeout(() => {
-      const mockAccommodations: Accommodation[] = [
-        {
-          id: 1,
-          center: 'Main Medical Center',
-          roomType: 'Standard Single',
-          checkInDate: '2023-06-09',
-          checkOutDate: '2023-06-12',
-          status: 'confirmed',
-          appointmentId: 101,
-          appointmentDate: '2023-06-10'
-        },
-        {
-          id: 2,
-          center: 'Downtown Clinic',
-          roomType: 'Deluxe Double',
-          checkInDate: '2023-07-14',
-          checkOutDate: '2023-07-16',
-          status: 'pending',
-          appointmentId: 102,
-          appointmentDate: '2023-07-15'
-        },
-        {
-          id: 3,
-          center: 'Main Medical Center',
-          roomType: 'Standard Single',
-          checkInDate: '2023-05-01',
-          checkOutDate: '2023-05-03',
-          status: 'checked_out',
-          appointmentId: 103,
-          appointmentDate: '2023-05-02'
-        },
-        {
-          id: 4,
-          center: 'Westside Health Center',
-          roomType: 'Accessible Suite',
-          checkInDate: '2023-04-10',
-          checkOutDate: '2023-04-12',
-          status: 'cancelled',
-          appointmentId: 104,
-          appointmentDate: '2023-04-11'
-        }
-      ];
-      setAccommodations(mockAccommodations);
-      setFilteredAccommodations(mockAccommodations);
-      setIsLoading(false);
-    }, 1000);
+    const fetchAccommodations = async () => {
+      setIsLoading(true);
+      setError(null);
+
+      try {
+        const response = await accommodationsAPI.getAccommodations();
+        const data = response.data.data || response.data;
+
+        // Transform API data to match our interface if needed
+        const formattedData = data.map((item: any) => ({
+          id: item.id,
+          center: item.center?.name || 'Unknown Center',
+          roomType: item.room_type || 'Standard Room',
+          checkInDate: item.check_in_date,
+          checkOutDate: item.check_out_date,
+          status: item.status || 'pending',
+          appointmentId: item.appointment_id,
+          appointmentDate: item.appointment?.date || new Date().toISOString()
+        }));
+
+        setAccommodations(formattedData);
+        setFilteredAccommodations(formattedData);
+      } catch (err: any) {
+        console.error('Error fetching accommodations:', err);
+        setError(err.response?.data?.message || 'Failed to load accommodations. Please try again.');
+        setAccommodations([]);
+        setFilteredAccommodations([]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchAccommodations();
   }, []);
 
   // Filter accommodations based on search term and status
   useEffect(() => {
     let filtered = accommodations;
-    
+
     // Filter by status
     if (statusFilter !== 'all') {
       filtered = filtered.filter(accommodation => accommodation.status === statusFilter);
     }
-    
+
     // Filter by search term
     if (searchTerm.trim() !== '') {
       const term = searchTerm.toLowerCase();
@@ -95,7 +82,7 @@ const PatientAccommodations: React.FC = () => {
           accommodation.roomType.toLowerCase().includes(term)
       );
     }
-    
+
     setFilteredAccommodations(filtered);
   }, [searchTerm, statusFilter, accommodations]);
 
@@ -118,7 +105,7 @@ const PatientAccommodations: React.FC = () => {
   };
 
   // Get status badge variant
-  const getStatusVariant = (status: string): string => {
+  const getStatusVariant = (status: string): 'success' | 'warning' | 'primary' | 'info' | 'danger' | 'secondary' => {
     switch (status) {
       case 'confirmed':
         return 'success';
@@ -213,6 +200,12 @@ const PatientAccommodations: React.FC = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
         >
+          {error && (
+            <Alert variant="error" className="mb-6" dismissible onDismiss={() => setError(null)}>
+              {error}
+            </Alert>
+          )}
+
           {isLoading ? (
             <div className="flex justify-center py-12">
               <svg className="animate-spin h-8 w-8 text-primary-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">

@@ -57,47 +57,9 @@ const PatientAccommodationDetails: React.FC = () => {
     setIsLoading(true);
     // Simulate API call
     setTimeout(() => {
-      // Mock accommodation data
-      const mockAccommodation: AccommodationDetails = {
-        id: Number(id),
-        center: {
-          id: 1,
-          name: 'Main Medical Center',
-          address: '123 Main St, Anytown, CA 12345',
-          phone: '(555) 123-4567'
-        },
-        room: {
-          id: 101,
-          roomNumber: '205',
-          type: 'Standard Single',
-          description: 'Comfortable single room with private bathroom and free Wi-Fi.',
-          pricePerNight: 85.00,
-          isAccessible: false
-        },
-        checkInDate: '2023-06-09',
-        checkOutDate: '2023-06-12',
-        numberOfNights: 3,
-        numberOfGuests: 1,
-        status: 'confirmed',
-        totalPrice: 255.00,
-        mealOption: {
-          id: 1,
-          name: 'Breakfast Only',
-          description: 'Continental breakfast served from 6:30 AM to 10:00 AM.',
-          price: 15.00
-        },
-        specialRequests: 'Extra pillows please.',
-        appointment: {
-          id: 101,
-          date: '2023-06-10',
-          time: '10:00 AM',
-          provider: 'Dr. John Smith'
-        },
-        createdAt: '2023-05-15T14:30:00Z',
-        updatedAt: '2023-05-15T14:30:00Z'
-      };
       
-      setAccommodation(mockAccommodation);
+      
+      setAccommodation();
       setIsLoading(false);
     }, 1000);
   }, [id]);

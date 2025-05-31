@@ -58,6 +58,7 @@ import {
   ProviderSchedulePage,
   ProviderPatientsPage,
   ProviderPatientDetailsPage,
+  ProviderAppointmentsPage,
   ProviderConsultationsPage,
   ProviderConsultationDetailsPage,
   ProviderNewConsultationPage
@@ -77,6 +78,25 @@ import {
   AdminCreateCenterPage,
   AdminEditCenterPage
 } from './pages/admin';
+
+// Import superuser pages
+import {
+  SuperuserDashboard
+} from './pages/superuser';
+
+// Import new admin pages
+import AdminAppointmentsPage from './pages/admin/appointments/AdminAppointmentsPage';
+import AdminAppointmentDetailsPage from './pages/admin/appointments/AdminAppointmentDetailsPage';
+import AdminAppointmentFormPage from './pages/admin/appointments/AdminAppointmentFormPage';
+import AdminRoomsPage from './pages/admin/rooms/AdminRoomsPage';
+import AdminRoomDetailsPage from './pages/admin/rooms/AdminRoomDetailsPage';
+import AdminRoomFormPage from './pages/admin/rooms/AdminRoomFormPage';
+import AdminMealOptionsPage from './pages/admin/meal-options/AdminMealOptionsPage';
+import AdminMealOptionDetailsPage from './pages/admin/meal-options/AdminMealOptionDetailsPage';
+import AdminMealOptionFormPage from './pages/admin/meal-options/AdminMealOptionFormPage';
+import AdminServiceCapacityPage from './pages/admin/service-capacity/AdminServiceCapacityPage';
+import AdminServiceCapacityDetailsPage from './pages/admin/service-capacity/AdminServiceCapacityDetailsPage';
+import AdminServiceCapacityFormPage from './pages/admin/service-capacity/AdminServiceCapacityFormPage';
 
 // Import store
 import { useAuthStore } from './store/authStore';
@@ -115,6 +135,8 @@ const AppContent: React.FC = () => {
         return '/provider/dashboard';
       case 'Admin':
         return '/admin/dashboard';
+      case 'Superuser':
+        return '/superuser/dashboard';
       default:
         return '/login';
     }
@@ -440,6 +462,17 @@ const AppContent: React.FC = () => {
         }
       />
 
+      {/* Provider appointments routes */}
+      <Route
+        path="/provider/appointments"
+        element={
+          <ProtectedRoute
+            element={<ProviderAppointmentsPage />}
+            allowedRoles={['Provider']}
+          />
+        }
+      />
+
       {/* Provider consultation routes */}
       <Route
         path="/provider/consultations"
@@ -482,13 +515,24 @@ const AppContent: React.FC = () => {
         }
       />
 
+      {/* Superuser routes */}
+      <Route
+        path="/superuser/dashboard"
+        element={
+          <ProtectedRoute
+            element={<SuperuserDashboard />}
+            allowedRoles={['Superuser']}
+          />
+        }
+      />
+
       {/* Admin users routes */}
       <Route
         path="/admin/users"
         element={
           <ProtectedRoute
             element={<AdminUsersPage />}
-            allowedRoles={['Admin']}
+            allowedRoles={['Admin', 'Superuser']}
           />
         }
       />
@@ -498,7 +542,7 @@ const AppContent: React.FC = () => {
         element={
           <ProtectedRoute
             element={<AdminCreateUserPage />}
-            allowedRoles={['Admin']}
+            allowedRoles={['Admin', 'Superuser']}
           />
         }
       />
@@ -508,7 +552,7 @@ const AppContent: React.FC = () => {
         element={
           <ProtectedRoute
             element={<AdminUserDetailsPage />}
-            allowedRoles={['Admin']}
+            allowedRoles={['Admin', 'Superuser']}
           />
         }
       />
@@ -518,7 +562,7 @@ const AppContent: React.FC = () => {
         element={
           <ProtectedRoute
             element={<AdminEditUserPage />}
-            allowedRoles={['Admin']}
+            allowedRoles={['Admin', 'Superuser']}
           />
         }
       />
@@ -529,7 +573,7 @@ const AppContent: React.FC = () => {
         element={
           <ProtectedRoute
             element={<AdminCentersPage />}
-            allowedRoles={['Admin']}
+            allowedRoles={['Admin', 'Superuser']}
           />
         }
       />
@@ -539,7 +583,7 @@ const AppContent: React.FC = () => {
         element={
           <ProtectedRoute
             element={<AdminCreateCenterPage />}
-            allowedRoles={['Admin']}
+            allowedRoles={['Admin', 'Superuser']}
           />
         }
       />
@@ -549,7 +593,7 @@ const AppContent: React.FC = () => {
         element={
           <ProtectedRoute
             element={<AdminCenterDetailsPage />}
-            allowedRoles={['Admin']}
+            allowedRoles={['Admin', 'Superuser']}
           />
         }
       />
@@ -559,18 +603,49 @@ const AppContent: React.FC = () => {
         element={
           <ProtectedRoute
             element={<AdminEditCenterPage />}
-            allowedRoles={['Admin']}
+            allowedRoles={['Admin', 'Superuser']}
           />
         }
       />
 
-      {/* Admin routes that need to be implemented */}
+      {/* Removed duplicate route for /admin/centers */}
+
       <Route
         path="/admin/appointments"
         element={
           <ProtectedRoute
-            element={<Navigate to="/admin/dashboard" replace />}
-            allowedRoles={['Admin']}
+            element={<AdminAppointmentsPage />}
+            allowedRoles={['Admin', 'Superuser']}
+          />
+        }
+      />
+
+      <Route
+        path="/admin/appointments/new"
+        element={
+          <ProtectedRoute
+            element={<AdminAppointmentFormPage />}
+            allowedRoles={['Admin', 'Superuser']}
+          />
+        }
+      />
+
+      <Route
+        path="/admin/appointments/:id"
+        element={
+          <ProtectedRoute
+            element={<AdminAppointmentDetailsPage />}
+            allowedRoles={['Admin', 'Superuser']}
+          />
+        }
+      />
+
+      <Route
+        path="/admin/appointments/:id/edit"
+        element={
+          <ProtectedRoute
+            element={<AdminAppointmentFormPage />}
+            allowedRoles={['Admin', 'Superuser']}
           />
         }
       />
@@ -579,8 +654,38 @@ const AppContent: React.FC = () => {
         path="/admin/rooms"
         element={
           <ProtectedRoute
-            element={<Navigate to="/admin/dashboard" replace />}
-            allowedRoles={['Admin']}
+            element={<AdminRoomsPage />}
+            allowedRoles={['Admin', 'Superuser']}
+          />
+        }
+      />
+
+      <Route
+        path="/admin/rooms/new"
+        element={
+          <ProtectedRoute
+            element={<AdminRoomFormPage />}
+            allowedRoles={['Admin', 'Superuser']}
+          />
+        }
+      />
+
+      <Route
+        path="/admin/rooms/:id"
+        element={
+          <ProtectedRoute
+            element={<AdminRoomDetailsPage />}
+            allowedRoles={['Admin', 'Superuser']}
+          />
+        }
+      />
+
+      <Route
+        path="/admin/rooms/:id/edit"
+        element={
+          <ProtectedRoute
+            element={<AdminRoomFormPage />}
+            allowedRoles={['Admin', 'Superuser']}
           />
         }
       />
@@ -589,8 +694,38 @@ const AppContent: React.FC = () => {
         path="/admin/meal-options"
         element={
           <ProtectedRoute
-            element={<Navigate to="/admin/dashboard" replace />}
-            allowedRoles={['Admin']}
+            element={<AdminMealOptionsPage />}
+            allowedRoles={['Admin', 'Superuser']}
+          />
+        }
+      />
+
+      <Route
+        path="/admin/meal-options/new"
+        element={
+          <ProtectedRoute
+            element={<AdminMealOptionFormPage />}
+            allowedRoles={['Admin', 'Superuser']}
+          />
+        }
+      />
+
+      <Route
+        path="/admin/meal-options/:id"
+        element={
+          <ProtectedRoute
+            element={<AdminMealOptionDetailsPage />}
+            allowedRoles={['Admin', 'Superuser']}
+          />
+        }
+      />
+
+      <Route
+        path="/admin/meal-options/:id/edit"
+        element={
+          <ProtectedRoute
+            element={<AdminMealOptionFormPage />}
+            allowedRoles={['Admin', 'Superuser']}
           />
         }
       />
@@ -599,8 +734,38 @@ const AppContent: React.FC = () => {
         path="/admin/service-capacity"
         element={
           <ProtectedRoute
-            element={<Navigate to="/admin/dashboard" replace />}
-            allowedRoles={['Admin']}
+            element={<AdminServiceCapacityPage />}
+            allowedRoles={['Admin', 'Superuser']}
+          />
+        }
+      />
+
+      <Route
+        path="/admin/service-capacity/new"
+        element={
+          <ProtectedRoute
+            element={<AdminServiceCapacityFormPage />}
+            allowedRoles={['Admin', 'Superuser']}
+          />
+        }
+      />
+
+      <Route
+        path="/admin/service-capacity/:id"
+        element={
+          <ProtectedRoute
+            element={<AdminServiceCapacityDetailsPage />}
+            allowedRoles={['Admin', 'Superuser']}
+          />
+        }
+      />
+
+      <Route
+        path="/admin/service-capacity/:id/edit"
+        element={
+          <ProtectedRoute
+            element={<AdminServiceCapacityFormPage />}
+            allowedRoles={['Admin', 'Superuser']}
           />
         }
       />
@@ -611,7 +776,7 @@ const AppContent: React.FC = () => {
         element={
           <ProtectedRoute
             element={<Navigate to={getDashboardRoute()} replace />}
-            allowedRoles={['Patient', 'Provider', 'Admin']}
+            allowedRoles={['Patient', 'Provider', 'Admin', 'Superuser']}
           />
         }
       />
@@ -621,7 +786,7 @@ const AppContent: React.FC = () => {
         element={
           <ProtectedRoute
             element={<Navigate to={getDashboardRoute()} replace />}
-            allowedRoles={['Patient', 'Provider', 'Admin']}
+            allowedRoles={['Patient', 'Provider', 'Admin', 'Superuser']}
           />
         }
       />
@@ -631,7 +796,7 @@ const AppContent: React.FC = () => {
         element={
           <ProtectedRoute
             element={<Navigate to={getDashboardRoute()} replace />}
-            allowedRoles={['Patient', 'Provider', 'Admin']}
+            allowedRoles={['Patient', 'Provider', 'Admin', 'Superuser']}
           />
         }
       />

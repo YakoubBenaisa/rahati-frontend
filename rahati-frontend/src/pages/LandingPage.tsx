@@ -102,12 +102,12 @@ const LandingPage: React.FC = () => {
   return (
     <MainLayout>
       {/* Hero section */}
-      <section className="py-16 md:py-24 relative overflow-hidden w-full">
+      <section className="py-16 md:py-24 relative overflow-hidden">
         {/* Animated background elements */}
         <div className="absolute top-0 left-0 w-full h-full overflow-hidden z-0">
           <div className="absolute inset-0 bg-gradient-to-br from-[var(--color-primary-50)] via-[var(--color-bg-primary)] to-[var(--color-secondary-50)] opacity-70"></div>
 
-          <svg className="absolute top-0 right-0 h-full w-full opacity-10 text-[var(--color-primary-300)]" viewBox="0 0 100 100" preserveAspectRatio="none">
+          <svg className="absolute top-0 right-0 h-full opacity-10 text-[var(--color-primary-300)]" viewBox="0 0 100 100" preserveAspectRatio="none">
             <defs>
               <pattern id="grid-pattern" width="10" height="10" patternUnits="userSpaceOnUse">
                 <path d="M 10 0 L 0 0 0 10" fill="none" stroke="currentColor" strokeWidth="0.5" />
@@ -157,7 +157,7 @@ const LandingPage: React.FC = () => {
           />
         </div>
 
-        <div className="relative z-10 max-w-7xl w-full mx-auto px-4 text-center">
+        <div className="relative z-10 max-w-5xl mx-auto text-center">
           <motion.div
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -235,7 +235,7 @@ const LandingPage: React.FC = () => {
       </section>
 
       {/* Features section */}
-      <section className="py-16 my-16 relative overflow-hidden w-full">
+      <section className="py-16 my-16 relative overflow-hidden">
         {/* Background decoration */}
         <div className="absolute inset-0 bg-gradient-to-br from-[var(--color-primary-50)] to-[var(--color-secondary-50)] opacity-80 z-0"></div>
         <div className="absolute inset-0 z-0">
@@ -249,7 +249,7 @@ const LandingPage: React.FC = () => {
           </svg>
         </div>
 
-        <div className="relative z-10 max-w-7xl w-full mx-auto px-4">
+        <div className="relative z-10">
           <div className="text-center mb-16">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -298,7 +298,7 @@ const LandingPage: React.FC = () => {
                       size="sm"
                       className="mt-4"
                       as={Link}
-                      to="/services"
+                      to={`/services/${feature.title.toLowerCase().replace(/\s+/g, '-')}`}
                     >
                       Learn More
                     </Button>
@@ -311,8 +311,8 @@ const LandingPage: React.FC = () => {
       </section>
 
       {/* How it works section */}
-      <section className="py-20 bg-[var(--color-bg-primary)] w-full">
-        <div className="max-w-7xl w-full mx-auto px-4">
+      <section className="py-20 bg-[var(--color-bg-primary)]">
+        <div className="container mx-auto px-4">
           <div className="text-center mb-16">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -419,7 +419,7 @@ const LandingPage: React.FC = () => {
       </section>
 
       {/* Testimonials section */}
-      <section className="py-20 my-12 relative overflow-hidden w-full">
+      <section className="py-20 my-12 relative overflow-hidden">
         {/* Background decoration */}
         <div className="absolute inset-0 bg-gradient-to-br from-[var(--color-secondary-50)] to-[var(--color-primary-50)] opacity-80 z-0"></div>
         <div className="absolute inset-0 z-0">
@@ -428,13 +428,13 @@ const LandingPage: React.FC = () => {
           </svg>
         </div>
 
-        <div className="relative z-10 max-w-7xl w-full mx-auto px-4">
+        <div className="relative z-10 container mx-auto px-4">
           <div className="text-center mb-16">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
-              className="inline-block px-6 py-2 bg-[var(--color-accent)] bg-opacity-20 text-[var(--color-accent)] rounded-full mb-4 font-medium"
+              className="inline-block px-6 py-2 bg-[var(--color-secondary-100)] bg-opacity-20 text-[var(--color-accent)] rounded-full mb-4 font-medium"
             >
               Testimonials
             </motion.div>
@@ -482,25 +482,24 @@ const LandingPage: React.FC = () => {
           <div className="mt-12 text-center">
             <Button
               as={Link}
-              to="/about"
+              to="/testimonials"
               variant="outline"
               size="lg"
               className="px-8"
             >
-              Learn More About Us
+              View All Testimonials
             </Button>
           </div>
         </div>
       </section>
 
       {/* CTA section */}
-      <section className="py-20 w-full">
-        <div className="max-w-7xl w-full mx-auto px-4">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="relative overflow-hidden rounded-3xl shadow-2xl"
+      <section className="py-20">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="relative overflow-hidden rounded-3xl shadow-2xl"
         >
           {/* Background with animated gradient */}
           <div className="absolute inset-0 bg-gradient-to-r from-[var(--color-primary-700)] via-[var(--color-secondary-700)] to-[var(--color-primary-800)] z-0">
@@ -589,7 +588,6 @@ const LandingPage: React.FC = () => {
             </motion.div>
           </div>
         </motion.div>
-        </div>
       </section>
     </MainLayout>
   );

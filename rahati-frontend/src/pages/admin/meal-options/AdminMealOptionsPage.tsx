@@ -150,7 +150,7 @@ const AdminMealOptionsPage: React.FC = () => {
                       <Table.Row key={option.id}>
                         <Table.Cell>{option.id}</Table.Cell>
                         <Table.Cell>{option.name}</Table.Cell>
-                        <Table.Cell>${option.price.toFixed(2)}</Table.Cell>
+                        <Table.Cell>${option.price}</Table.Cell>
                         <Table.Cell>
                           <div className="flex flex-wrap gap-1">
                             {option.is_vegetarian && (

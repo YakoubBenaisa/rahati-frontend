@@ -5,6 +5,7 @@ import { Card, Button, Input, Select, Textarea, Alert } from '../../../component
 import { useAuth } from '../../../hooks';
 import { useForm } from '../../../hooks';
 import { motion } from 'framer-motion';
+import { appointmentsAPI, centersAPI, accommodationsAPI, roomsAPI, mealOptionsAPI } from '../../../services/api';
 
 interface RoomType {
   id: number;
@@ -50,205 +51,80 @@ const PatientBookAccommodation: React.FC = () => {
   const queryParams = new URLSearchParams(location.search);
   const appointmentIdFromQuery = queryParams.get('appointment');
 
-  // Mock fetch appointments data
+  // Fetch appointments data from API
   useEffect(() => {
-    // Simulate API call
-    setTimeout(() => {
-      const mockAppointments = [
-        { id: 101, date: '2023-06-10', center: 'Main Medical Center', centerId: 1 },
-        { id: 102, date: '2023-07-15', center: 'Downtown Clinic', centerId: 2 },
-        { id: 103, date: '2023-08-20', center: 'Westside Health Center', centerId: 3 }
-      ];
-      setAppointments(mockAppointments);
-      
-      // If appointment ID is provided in query, set center ID based on that appointment
-      if (appointmentIdFromQuery) {
-        const appointment = mockAppointments.find(a => a.id === Number(appointmentIdFromQuery));
-        if (appointment) {
-          setFieldValue('center_id', appointment.centerId.toString());
+    const fetchAppointments = async () => {
+      setIsLoading(true);
+      setError(null);
+
+      try {
+        // Get user's appointments
+        const response = await appointmentsAPI.getAppointments({ status: 'scheduled' });
+        const data = response.data.data || response.data;
+
+        // Transform API data to match our interface
+        const formattedData = data.map((item: any) => ({
+          id: item.id,
+          date: item.date,
+          center: item.center?.name || 'Unknown Center',
+          centerId: item.center_id
+        }));
+
+        setAppointments(formattedData);
+
+        // If appointment ID is provided in query, set center ID based on that appointment
+        if (appointmentIdFromQuery) {
+          const appointment = formattedData.find(a => a.id === Number(appointmentIdFromQuery));
+          if (appointment) {
+            setFieldValue('center_id', appointment.centerId.toString());
+          }
         }
+      } catch (err: any) {
+        console.error('Error fetching appointments:', err);
+        setError(err.response?.data?.message || 'Failed to load appointments. Please try again.');
+        setAppointments([]);
+      } finally {
+        setIsLoading(false);
       }
-    }, 500);
+    };
+
+    fetchAppointments();
   }, [appointmentIdFromQuery]);
 
-  // Mock fetch centers data
+  // Fetch centers data from API
   useEffect(() => {
-    // Simulate API call
-    setTimeout(() => {
-      const mockCenters = [
-        { id: 1, name: 'Main Medical Center' },
-        { id: 2, name: 'Downtown Clinic' },
-        { id: 3, name: 'Westside Health Center' }
-      ];
-      setCenters(mockCenters);
-    }, 500);
+    const fetchCenters = async () => {
+      setIsLoading(true);
+      setError(null);
+
+      try {
+        const response = await centersAPI.getCenters();
+        const data = response.data.data || response.data;
+
+        // Transform API data to match our interface
+        const formattedData = data.map((item: any) => ({
+          id: item.id,
+          name: item.name
+        }));
+
+        setCenters(formattedData);
+      } catch (err: any) {
+        console.error('Error fetching centers:', err);
+        setError(err.response?.data?.message || 'Failed to load healthcare centers. Please try again.');
+        setCenters([]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchCenters();
   }, []);
 
-  // Mock fetch room types when center changes
-  useEffect(() => {
-    if (values.center_id) {
-      setRoomTypes([]);
-      setIsLoading(true);
-      
-      // Simulate API call
-      setTimeout(() => {
-        const mockRoomTypes: RoomType[] = [
-          {
-            id: 1,
-            name: 'Standard Single',
-            description: 'Comfortable single room with private bathroom and free Wi-Fi.',
-            pricePerNight: 85.00,
-            isAccessible: false,
-            maxGuests: 1
-          },
-          {
-            id: 2,
-            name: 'Deluxe Double',
-            description: 'Spacious room with two beds, private bathroom, and sitting area.',
-            pricePerNight: 120.00,
-            isAccessible: false,
-            maxGuests: 2
-          },
-          {
-            id: 3,
-            name: 'Accessible Suite',
-            description: 'Fully accessible suite with adapted bathroom and amenities.',
-            pricePerNight: 150.00,
-            isAccessible: true,
-            maxGuests: 2
-          }
-        ];
-        setRoomTypes(mockRoomTypes);
-        setIsLoading(false);
-      }, 500);
-    }
-  }, [values.center_id]);
+  // Form validation and submission functions will be defined later
+  let validateForm: (values: BookAccommodationFormValues) => Partial<Record<keyof BookAccommodationFormValues, string>>;
+  let handleSubmit: (values: BookAccommodationFormValues, resetForm: () => void) => Promise<void>;
 
-  // Mock fetch meal options when center changes
-  useEffect(() => {
-    if (values.center_id) {
-      setMealOptions([]);
-      
-      // Simulate API call
-      setTimeout(() => {
-        const mockMealOptions: MealOption[] = [
-          {
-            id: 1,
-            name: 'No Meals',
-            description: 'No meals included.',
-            price: 0
-          },
-          {
-            id: 2,
-            name: 'Breakfast Only',
-            description: 'Continental breakfast served from 6:30 AM to 10:00 AM.',
-            price: 15.00
-          },
-          {
-            id: 3,
-            name: 'Full Board',
-            description: 'Breakfast, lunch, and dinner included.',
-            price: 45.00
-          }
-        ];
-        setMealOptions(mockMealOptions);
-      }, 500);
-    }
-  }, [values.center_id]);
-
-  // Calculate total price
-  useEffect(() => {
-    if (values.room_type_id && values.check_in_date && values.check_out_date) {
-      const roomType = roomTypes.find(rt => rt.id.toString() === values.room_type_id);
-      const mealOption = values.meal_option_id 
-        ? mealOptions.find(mo => mo.id.toString() === values.meal_option_id)
-        : null;
-      
-      if (roomType) {
-        const checkInDate = new Date(values.check_in_date);
-        const checkOutDate = new Date(values.check_out_date);
-        const nights = Math.max(1, Math.ceil((checkOutDate.getTime() - checkInDate.getTime()) / (1000 * 60 * 60 * 24)));
-        
-        let price = roomType.pricePerNight * nights;
-        if (mealOption) {
-          price += mealOption.price;
-        }
-        
-        setTotalPrice(price);
-      }
-    } else {
-      setTotalPrice(0);
-    }
-  }, [values.room_type_id, values.check_in_date, values.check_out_date, values.meal_option_id, roomTypes, mealOptions]);
-
-  // Form validation
-  const validateForm = (values: BookAccommodationFormValues) => {
-    const errors: Partial<Record<keyof BookAccommodationFormValues, string>> = {};
-    
-    if (!values.appointment_id) {
-      errors.appointment_id = 'Please select an appointment';
-    }
-    
-    if (!values.center_id) {
-      errors.center_id = 'Please select a healthcare center';
-    }
-    
-    if (!values.room_type_id) {
-      errors.room_type_id = 'Please select a room type';
-    }
-    
-    if (!values.check_in_date) {
-      errors.check_in_date = 'Please select a check-in date';
-    }
-    
-    if (!values.check_out_date) {
-      errors.check_out_date = 'Please select a check-out date';
-    } else if (values.check_in_date && new Date(values.check_out_date) <= new Date(values.check_in_date)) {
-      errors.check_out_date = 'Check-out date must be after check-in date';
-    }
-    
-    if (!values.number_of_guests) {
-      errors.number_of_guests = 'Please enter the number of guests';
-    } else {
-      const guests = parseInt(values.number_of_guests);
-      const roomType = roomTypes.find(rt => rt.id.toString() === values.room_type_id);
-      
-      if (isNaN(guests) || guests < 1) {
-        errors.number_of_guests = 'Number of guests must be at least 1';
-      } else if (roomType && guests > roomType.maxGuests) {
-        errors.number_of_guests = `Maximum ${roomType.maxGuests} guests allowed for this room type`;
-      }
-    }
-    
-    return errors;
-  };
-
-  // Handle form submission
-  const handleSubmit = (values: BookAccommodationFormValues, resetForm: () => void) => {
-    setIsLoading(true);
-    setError(null);
-    
-    // Simulate API call
-    setTimeout(() => {
-      try {
-        console.log('Booking accommodation:', values);
-        
-        // Mock successful response
-        setSuccess('Accommodation booked successfully');
-        setIsLoading(false);
-        
-        // Redirect to accommodations list after 2 seconds
-        setTimeout(() => {
-          navigate('/patient/accommodations');
-        }, 2000);
-      } catch (err) {
-        setError('Failed to book accommodation. Please try again.');
-        setIsLoading(false);
-      }
-    }, 1000);
-  };
-
-  // Initialize form with default values
+  // Initialize form with default values - we'll define the functions after this
   const { values, errors, touched, handleChange, handleBlur, handleSubmit: submitForm, isSubmitting, setFieldValue } = useForm<BookAccommodationFormValues>(
     {
       appointment_id: appointmentIdFromQuery || '',
@@ -260,9 +136,184 @@ const PatientBookAccommodation: React.FC = () => {
       meal_option_id: '',
       special_requests: ''
     },
-    handleSubmit,
-    validateForm
+    (values, resetForm) => handleSubmit(values, resetForm),
+    (values) => validateForm(values)
   );
+
+  // Fetch room types when center changes
+  useEffect(() => {
+    if (values.center_id) {
+      setRoomTypes([]);
+      setIsLoading(true);
+
+      const fetchRoomTypes = async () => {
+        try {
+          const response = await roomsAPI.getRooms({ center_id: values.center_id });
+          const data = response.data.data || response.data;
+
+          // Transform API data to match our interface
+          const formattedData = data.map((item: any) => ({
+            id: item.id,
+            name: item.name || 'Standard Room',
+            description: item.description || 'No description available',
+            pricePerNight: item.price_per_night || 0,
+            isAccessible: item.is_accessible || false,
+            maxGuests: item.max_guests || 2
+          }));
+
+          setRoomTypes(formattedData);
+        } catch (err: any) {
+          console.error('Error fetching room types:', err);
+          setError(err.response?.data?.message || 'Failed to load room types. Please try again.');
+          setRoomTypes([]);
+        } finally {
+          setIsLoading(false);
+        }
+      };
+
+      fetchRoomTypes();
+    }
+  }, [values.center_id]);
+
+  // Fetch meal options when center changes
+  useEffect(() => {
+    if (values.center_id) {
+      setMealOptions([]);
+      setIsLoading(true);
+
+      const fetchMealOptions = async () => {
+        try {
+          const response = await mealOptionsAPI.getMealOptions({ center_id: values.center_id });
+          const data = response.data.data || response.data;
+
+          // Transform API data to match our interface
+          const formattedData = data.map((item: any) => ({
+            id: item.id,
+            name: item.name || 'No Meals',
+            description: item.description || 'No description available',
+            price: item.price || 0
+          }));
+
+          setMealOptions(formattedData);
+        } catch (err: any) {
+          console.error('Error fetching meal options:', err);
+          setError(err.response?.data?.message || 'Failed to load meal options. Please try again.');
+          setMealOptions([]);
+        } finally {
+          setIsLoading(false);
+        }
+      };
+
+      fetchMealOptions();
+    }
+  }, [values.center_id]);
+
+  // Calculate total price
+  useEffect(() => {
+    if (values.room_type_id && values.check_in_date && values.check_out_date) {
+      const roomType = roomTypes.find(rt => rt.id.toString() === values.room_type_id);
+      const mealOption = values.meal_option_id
+        ? mealOptions.find(mo => mo.id.toString() === values.meal_option_id)
+        : null;
+
+      if (roomType) {
+        const checkInDate = new Date(values.check_in_date);
+        const checkOutDate = new Date(values.check_out_date);
+        const nights = Math.max(1, Math.ceil((checkOutDate.getTime() - checkInDate.getTime()) / (1000 * 60 * 60 * 24)));
+
+        let price = roomType.pricePerNight * nights;
+        if (mealOption) {
+          price += mealOption.price;
+        }
+
+        setTotalPrice(price);
+      }
+    } else {
+      setTotalPrice(0);
+    }
+  }, [values.room_type_id, values.check_in_date, values.check_out_date, values.meal_option_id, roomTypes, mealOptions]);
+
+  // Define the validation function
+  validateForm = (values: BookAccommodationFormValues) => {
+    const errors: Partial<Record<keyof BookAccommodationFormValues, string>> = {};
+
+    if (!values.appointment_id) {
+      errors.appointment_id = 'Please select an appointment';
+    }
+
+    if (!values.center_id) {
+      errors.center_id = 'Please select a healthcare center';
+    }
+
+    if (!values.room_type_id) {
+      errors.room_type_id = 'Please select a room type';
+    }
+
+    if (!values.check_in_date) {
+      errors.check_in_date = 'Please select a check-in date';
+    }
+
+    if (!values.check_out_date) {
+      errors.check_out_date = 'Please select a check-out date';
+    } else if (values.check_in_date && new Date(values.check_out_date) <= new Date(values.check_in_date)) {
+      errors.check_out_date = 'Check-out date must be after check-in date';
+    }
+
+    if (!values.number_of_guests) {
+      errors.number_of_guests = 'Please enter the number of guests';
+    } else {
+      const guests = parseInt(values.number_of_guests);
+      const roomType = roomTypes.find(rt => rt.id.toString() === values.room_type_id);
+
+      if (isNaN(guests) || guests < 1) {
+        errors.number_of_guests = 'Number of guests must be at least 1';
+      } else if (roomType && guests > roomType.maxGuests) {
+        errors.number_of_guests = `Maximum ${roomType.maxGuests} guests allowed for this room type`;
+      }
+    }
+
+    return errors;
+  };
+
+  // Define the submission function
+  handleSubmit = async (values: BookAccommodationFormValues, resetForm: () => void) => {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      console.log('Booking accommodation:', values);
+
+      // Create accommodation booking data
+      const bookingData = {
+        appointment_id: parseInt(values.appointment_id),
+        center_id: parseInt(values.center_id),
+        room_type_id: parseInt(values.room_type_id),
+        check_in_date: values.check_in_date,
+        check_out_date: values.check_out_date,
+        number_of_guests: parseInt(values.number_of_guests),
+        meal_option_id: values.meal_option_id ? parseInt(values.meal_option_id) : null,
+        special_requests: values.special_requests
+      };
+
+      // Call API to book accommodation
+      await accommodationsAPI.bookAccommodation(bookingData);
+
+      setSuccess('Accommodation booked successfully');
+      resetForm();
+
+      // Redirect to accommodations list after 2 seconds
+      setTimeout(() => {
+        navigate('/patient/accommodations');
+      }, 2000);
+    } catch (err: any) {
+      console.error('Error booking accommodation:', err);
+      setError(err.response?.data?.message || 'Failed to book accommodation. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+
 
   // Get tomorrow's date as the minimum date for check-in
   const getTomorrowDate = () => {
@@ -275,19 +326,19 @@ const PatientBookAccommodation: React.FC = () => {
   const handleAppointmentChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const appointmentId = e.target.value;
     setFieldValue('appointment_id', appointmentId);
-    
+
     // Set center based on selected appointment
     if (appointmentId) {
       const appointment = appointments.find(a => a.id.toString() === appointmentId);
       if (appointment) {
         setFieldValue('center_id', appointment.centerId.toString());
-        
+
         // Set check-in date to day before appointment
         const appointmentDate = new Date(appointment.date);
         const checkInDate = new Date(appointmentDate);
         checkInDate.setDate(appointmentDate.getDate() - 1);
         setFieldValue('check_in_date', checkInDate.toISOString().split('T')[0]);
-        
+
         // Set check-out date to day after appointment
         const checkOutDate = new Date(appointmentDate);
         checkOutDate.setDate(appointmentDate.getDate() + 1);
@@ -372,7 +423,7 @@ const PatientBookAccommodation: React.FC = () => {
                           label: `${new Date(appointment.date).toLocaleDateString()} - ${appointment.center}`
                         }))
                       ]}
-                      error={touched.appointment_id && errors.appointment_id}
+                      error={touched.appointment_id && errors.appointment_id ? errors.appointment_id : undefined}
                       disabled={isLoading || !!appointmentIdFromQuery}
                     />
                   </div>
@@ -394,7 +445,7 @@ const PatientBookAccommodation: React.FC = () => {
                           label: center.name
                         }))
                       ]}
-                      error={touched.center_id && errors.center_id}
+                      error={touched.center_id && errors.center_id ? errors.center_id : undefined}
                       disabled={isLoading || !!values.appointment_id}
                     />
                   </div>
@@ -416,7 +467,7 @@ const PatientBookAccommodation: React.FC = () => {
                           label: `${roomType.name} - $${roomType.pricePerNight.toFixed(2)}/night${roomType.isAccessible ? ' (Accessible)' : ''}`
                         }))
                       ]}
-                      error={touched.room_type_id && errors.room_type_id}
+                      error={touched.room_type_id && errors.room_type_id ? errors.room_type_id : undefined}
                       disabled={!values.center_id || isLoading}
                     />
                     {values.room_type_id && (
@@ -439,7 +490,7 @@ const PatientBookAccommodation: React.FC = () => {
                         onChange={handleChange}
                         onBlur={handleBlur}
                         min={getTomorrowDate()}
-                        error={touched.check_in_date && errors.check_in_date}
+                        error={touched.check_in_date && errors.check_in_date ? errors.check_in_date : undefined}
                         disabled={isLoading || !!values.appointment_id}
                       />
                     </div>
@@ -456,7 +507,7 @@ const PatientBookAccommodation: React.FC = () => {
                         onChange={handleChange}
                         onBlur={handleBlur}
                         min={values.check_in_date || getTomorrowDate()}
-                        error={touched.check_out_date && errors.check_out_date}
+                        error={touched.check_out_date && errors.check_out_date ? errors.check_out_date : undefined}
                         disabled={isLoading || !!values.appointment_id}
                       />
                     </div>
@@ -476,7 +527,7 @@ const PatientBookAccommodation: React.FC = () => {
                         value={values.number_of_guests}
                         onChange={handleChange}
                         onBlur={handleBlur}
-                        error={touched.number_of_guests && errors.number_of_guests}
+                        error={touched.number_of_guests && errors.number_of_guests ? errors.number_of_guests : undefined}
                       />
                     </div>
 
@@ -497,7 +548,7 @@ const PatientBookAccommodation: React.FC = () => {
                             label: `${option.name}${option.price > 0 ? ` - $${option.price.toFixed(2)}` : ''}`
                           }))
                         ]}
-                        error={touched.meal_option_id && errors.meal_option_id}
+                        error={touched.meal_option_id && errors.meal_option_id ? errors.meal_option_id : undefined}
                         disabled={!values.center_id || isLoading}
                       />
                       {values.meal_option_id && (
@@ -520,7 +571,7 @@ const PatientBookAccommodation: React.FC = () => {
                       onBlur={handleBlur}
                       placeholder="Enter any special requests or requirements"
                       rows={4}
-                      error={touched.special_requests && errors.special_requests}
+                      error={touched.special_requests && errors.special_requests ? errors.special_requests : undefined}
                     />
                   </div>
 

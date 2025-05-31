@@ -15,8 +15,10 @@ api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token');
     if (token && config.headers) {
-      // API expects just the token without 'Bearer ' prefix
-      config.headers.Authorization = token;
+      // Check if the API expects the token with or without 'Bearer ' prefix
+      // For this API, we'll include the 'Bearer ' prefix
+      config.headers.Authorization = `Bearer ${token}`;
+      console.log('Request with token:', config.url, config.headers.Authorization);
     }
     return config;
   },
@@ -25,10 +27,16 @@ api.interceptors.request.use(
 
 // Add a response interceptor to handle errors
 api.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    console.log('API Response:', response.config.url, response.status, response.data);
+    return response;
+  },
   (error: AxiosError) => {
+    console.error('API Error:', error.config?.url, error.response?.status, error.response?.data);
+
     // Handle 401 Unauthorized errors (token expired or invalid)
     if (error.response?.status === 401) {
+      console.log('Unauthorized access, redirecting to login');
       localStorage.removeItem('token');
       localStorage.removeItem('user');
       window.location.href = '/login';
@@ -39,17 +47,25 @@ api.interceptors.response.use(
 
 // Authentication API calls
 export const authAPI = {
-  login: (email: string, password: string): Promise<AxiosResponse<AuthResponse>> =>
-    api.post('/auth/login', { email, password }),
+  login: (email: string, password: string): Promise<AxiosResponse<AuthResponse>> => {
+    console.log('Sending login request with:', { email, password });
+    return api.post('/auth/login', { email, password });
+  },
 
-  register: (userData: any): Promise<AxiosResponse<AuthResponse>> =>
-    api.post('/auth/register', userData),
+  register: (userData: any): Promise<AxiosResponse<AuthResponse>> => {
+    console.log('Sending register request with:', userData);
+    return api.post('/auth/register', userData);
+  },
 
-  logout: (): Promise<AxiosResponse<any>> =>
-    api.post('/auth/logout'),
+  logout: (): Promise<AxiosResponse<any>> => {
+    console.log('Sending logout request');
+    return api.post('/auth/logout');
+  },
 
-  getCurrentUser: (): Promise<AxiosResponse<any>> =>
-    api.get('/auth/user'),
+  getCurrentUser: (): Promise<AxiosResponse<any>> => {
+    console.log('Fetching current user');
+    return api.get('/auth/user');
+  },
 };
 
 // Users API calls
@@ -68,6 +84,19 @@ export const usersAPI = {
 
   deleteUser: (id: number): Promise<AxiosResponse<any>> =>
     api.delete(`/users/${id}`),
+
+  resetPassword: (id: number): Promise<AxiosResponse<any>> =>
+    api.post(`/users/${id}/reset-password`),
+
+  // Provider-specific routes
+  getMyPatients: (): Promise<AxiosResponse<any>> =>
+    api.get('/my-patients'),
+
+  getMyPatientsDetailed: (): Promise<AxiosResponse<any>> =>
+    api.get('/my-patients-detailed'),
+
+  getPatientDetails: (patientId: number): Promise<AxiosResponse<any>> =>
+    api.get(`/patient-details/${patientId}`),
 };
 
 // Centers API calls
@@ -114,14 +143,24 @@ export const consultationsAPI = {
   getConsultationById: (id: number): Promise<AxiosResponse<any>> =>
     api.get(`/consultations/${id}`),
 
-  startConsultation: (consultationData: any): Promise<AxiosResponse<any>> =>
+  createConsultation: (consultationData: any): Promise<AxiosResponse<any>> =>
     api.post('/consultations', consultationData),
 
-  completeConsultation: (id: number, consultationData: any): Promise<AxiosResponse<any>> =>
+  updateConsultation: (id: number, consultationData: any): Promise<AxiosResponse<any>> =>
     api.put(`/consultations/${id}`, consultationData),
 
-  cancelConsultation: (id: number): Promise<AxiosResponse<any>> =>
+  deleteConsultation: (id: number): Promise<AxiosResponse<any>> =>
     api.delete(`/consultations/${id}`),
+
+  // Additional methods for specific actions
+  startConsultation: (id: number): Promise<AxiosResponse<any>> =>
+    api.patch(`/consultations/${id}/start`),
+
+  completeConsultation: (id: number, consultationData: any): Promise<AxiosResponse<any>> =>
+    api.patch(`/consultations/${id}/complete`, consultationData),
+
+  cancelConsultation: (id: number, reason?: string): Promise<AxiosResponse<any>> =>
+    api.patch(`/consultations/${id}/cancel`, { reason }),
 };
 
 // Accommodations API calls
@@ -232,20 +271,7 @@ export const feedbackAPI = {
     api.delete(`/feedback/${id}`),
 };
 
-// Notifications API calls
-export const notificationsAPI = {
-  getNotifications: (params?: any): Promise<AxiosResponse<any>> =>
-    api.get('/notifications', { params }),
 
-  getNotificationById: (id: number): Promise<AxiosResponse<any>> =>
-    api.get(`/notifications/${id}`),
-
-  markNotificationAsRead: (id: number): Promise<AxiosResponse<any>> =>
-    api.patch(`/notifications/${id}/read`),
-
-  deleteNotification: (id: number): Promise<AxiosResponse<any>> =>
-    api.delete(`/notifications/${id}`),
-};
 
 // Service capacity API calls
 export const serviceCapacityAPI = {
@@ -263,6 +289,36 @@ export const serviceCapacityAPI = {
 
   deleteServiceCapacity: (id: number): Promise<AxiosResponse<any>> =>
     api.delete(`/service-capacity/${id}`),
+};
+
+// Provider schedule API calls
+export const scheduleAPI = {
+  getProviderSchedule: (providerId: number): Promise<AxiosResponse<any>> =>
+    api.get(`/providers/${providerId}/schedule`),
+
+  updateProviderSchedule: (providerId: number, scheduleData: any): Promise<AxiosResponse<any>> =>
+    api.put(`/providers/${providerId}/schedule`, scheduleData),
+
+  updateProviderAvailability: (providerId: number, day: string, availabilityData: any): Promise<AxiosResponse<any>> =>
+    api.patch(`/providers/${providerId}/schedule/${day}`, availabilityData),
+};
+
+// Notifications API calls
+export const notificationsAPI = {
+  getNotifications: (params?: any): Promise<AxiosResponse<any>> =>
+    api.get('/notifications', { params }),
+
+  getNotificationById: (id: number): Promise<AxiosResponse<any>> =>
+    api.get(`/notifications/${id}`),
+
+  markNotificationAsRead: (id: number): Promise<AxiosResponse<any>> =>
+    api.patch(`/notifications/${id}/read`, {}),
+
+  deleteNotification: (id: number): Promise<AxiosResponse<any>> =>
+    api.delete(`/notifications/${id}`),
+
+  markAllAsRead: (): Promise<AxiosResponse<any>> =>
+    api.patch('/notifications/mark-all-read', {})
 };
 
 export default api;

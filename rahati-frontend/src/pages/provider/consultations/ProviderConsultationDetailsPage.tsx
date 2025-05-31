@@ -43,36 +43,20 @@ const ProviderConsultationDetailsPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
 
-  // Mock fetch consultation data
+  //  fetch consultation data
   useEffect(() => {
     setIsLoading(true);
-    // Simulate API call
+    //  API call
     setTimeout(() => {
-      // Mock consultation data
-      const mockConsultation: ConsultationDetails = {
-        id: Number(id),
-        patientId: 1,
-        patientName: 'John Doe',
-        patientEmail: 'john.doe@example.com',
-        patientPhone: '(555) 123-4567',
-        date: '2023-06-05',
-        time: '11:15 AM',
-        status: 'active',
-        type: 'Initial Consultation',
-        symptoms: ['Headache', 'Dizziness', 'Fatigue'],
-        medications: ['Ibuprofen 400mg'],
-        followUpRequired: false,
-        createdAt: '2023-05-30T10:00:00Z',
-        updatedAt: '2023-05-30T10:00:00Z'
-      };
-
-      setConsultation(mockConsultation);
-      setDiagnosis(mockConsultation.diagnosis || '');
-      setTreatmentPlan(mockConsultation.treatmentPlan || '');
-      setFollowUpRequired(mockConsultation.followUpRequired);
-      setFollowUpDate(mockConsultation.followUpDate || '');
-      setNotes(mockConsultation.notes || '');
-      setMedications(mockConsultation.medications || []);
+      //  consultation data
+     
+      setConsultation(Consultation);
+      setDiagnosis(kConsultation.diagnosis || '');
+      setTreatmentPlan(Consultation.treatmentPlan || '');
+      setFollowUpRequired(Consultation.followUpRequired);
+      setFollowUpDate(Consultation.followUpDate || '');
+      setNotes(Consultation.notes || '');
+      setMedications(Consultation.medications || []);
       setIsLoading(false);
     }, 1000);
   }, [id]);

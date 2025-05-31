@@ -48,7 +48,7 @@ const Button = forwardRef<HTMLButtonElement | HTMLAnchorElement, CombinedButtonP
 
   // Base classes
   const baseClasses = 'inline-flex items-center justify-center font-medium rounded-md focus:outline-none transition-all duration-200';
-  
+
   // Size classes
   const sizeClasses = {
     xs: 'px-2 py-1 text-xs',
@@ -57,7 +57,7 @@ const Button = forwardRef<HTMLButtonElement | HTMLAnchorElement, CombinedButtonP
     lg: 'px-5 py-2.5 text-lg',
     xl: 'px-6 py-3 text-xl',
   };
-  
+
   // Variant classes
   const variantClasses = {
     primary: 'bg-[var(--color-primary-600)] text-white hover:bg-[var(--color-primary-700)] focus:ring-2 focus:ring-[var(--color-primary-500)] focus:ring-offset-2',
@@ -68,13 +68,13 @@ const Button = forwardRef<HTMLButtonElement | HTMLAnchorElement, CombinedButtonP
     link: 'bg-transparent text-[var(--color-primary-600)] hover:text-[var(--color-primary-700)] hover:underline p-0 focus:ring-0',
     danger: 'bg-[var(--color-error)] text-white hover:opacity-90 focus:ring-2 focus:ring-[var(--color-error)] focus:ring-offset-2',
   };
-  
+
   // Disabled classes
   const disabledClasses = 'opacity-50 cursor-not-allowed';
-  
+
   // Full width class
   const fullWidthClass = fullWidth ? 'w-full' : '';
-  
+
   // Combine all classes
   const buttonClasses = `
     ${baseClasses}
@@ -84,7 +84,7 @@ const Button = forwardRef<HTMLButtonElement | HTMLAnchorElement, CombinedButtonP
     ${fullWidthClass}
     ${className}
   `.trim().replace(/\s+/g, ' ');
-  
+
   // Button content
   const content = (
     <>
@@ -109,30 +109,26 @@ const Button = forwardRef<HTMLButtonElement | HTMLAnchorElement, CombinedButtonP
   // Render as Link
   if (Component === Link) {
     return (
-      <motion.div {...animationProps}>
-        <Component
-          className={buttonClasses}
-          ref={ref as React.Ref<HTMLAnchorElement>}
-          {...rest as LinkProps}
-        >
-          {content}
-        </Component>
-      </motion.div>
+      <Component
+        className={buttonClasses}
+        ref={ref as React.Ref<HTMLAnchorElement>}
+        {...rest as LinkProps}
+      >
+        {content}
+      </Component>
     );
   }
 
   // Render as button
   return (
-    <motion.div {...animationProps}>
-      <Component
-        className={buttonClasses}
-        disabled={disabled || isLoading}
-        ref={ref as React.Ref<HTMLButtonElement>}
-        {...rest}
-      >
-        {content}
-      </Component>
-    </motion.div>
+    <Component
+      className={buttonClasses}
+      disabled={disabled || isLoading}
+      ref={ref as React.Ref<HTMLButtonElement>}
+      {...rest}
+    >
+      {content}
+    </Component>
   );
 });
 

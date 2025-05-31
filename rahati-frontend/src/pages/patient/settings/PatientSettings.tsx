@@ -455,7 +455,7 @@ const PatientSettings: React.FC = () => {
                     <p className="text-sm text-gray-500 mb-2">Log out of your account on this device</p>
                     <Button
                       variant="outline"
-                      onClick={logout}
+                      onClick={() => logout()}
                     >
                       Log Out
                     </Button>

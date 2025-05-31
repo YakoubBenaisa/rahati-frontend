@@ -154,7 +154,7 @@ const AdminRoomsPage: React.FC = () => {
                         <Table.Cell>{room.room_number}</Table.Cell>
                         <Table.Cell>{room.center?.name || `Center #${room.center_id}`}</Table.Cell>
                         <Table.Cell>{room.type}</Table.Cell>
-                        <Table.Cell>${room.price_per_night.toFixed(2)}</Table.Cell>
+                        <Table.Cell>${room.price_per_night}</Table.Cell>
                         <Table.Cell>{room.capacity} person(s)</Table.Cell>
                         <Table.Cell>
                           <Badge variant={room.is_available ? 'success' : 'error'}>

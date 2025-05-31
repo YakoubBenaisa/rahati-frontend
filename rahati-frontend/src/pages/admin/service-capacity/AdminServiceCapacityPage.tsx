@@ -30,7 +30,7 @@ const AdminServiceCapacityPage: React.FC = () => {
         console.error('Error fetching centers:', err);
       }
     };
-    
+
     fetchCenters();
   }, []);
 
@@ -39,16 +39,24 @@ const AdminServiceCapacityPage: React.FC = () => {
     const fetchServiceCapacities = async () => {
       setIsLoading(true);
       setError(null);
-      
+
       try {
-        const response = await serviceCapacityAPI.getServiceCapacities({
+        // If user is an Admin (not Superuser), restrict to their center
+        const params: any = {
           page: currentPage,
           per_page: itemsPerPage
-        });
-        
+        };
+
+        // Add center_id filter for Admin users (not Superuser)
+        if (user?.role === 'Admin' && user?.center_id) {
+          params.center_id = user.center_id;
+        }
+
+        const response = await serviceCapacityAPI.getServiceCapacities(params);
+
         const data = response.data;
         setServiceCapacities(data.data || data);
-        
+
         // Handle pagination if available
         if (data.meta) {
           setTotalPages(data.meta.last_page);
@@ -61,9 +69,9 @@ const AdminServiceCapacityPage: React.FC = () => {
         setIsLoading(false);
       }
     };
-    
+
     fetchServiceCapacities();
-  }, [currentPage]);
+  }, [currentPage, user]);
 
   // Handle page change
   const handlePageChange = (page: number) => {
@@ -90,6 +98,14 @@ const AdminServiceCapacityPage: React.FC = () => {
               <p className="mt-2 text-[var(--color-text-secondary)]">
                 Manage service capacity for healthcare centers.
               </p>
+              {user?.role === 'Admin' && user?.center_id && (
+                <p className="mt-2 text-sm text-blue-600 bg-blue-50 p-2 rounded">
+                  <svg className="inline-block h-4 w-4 mr-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  You are viewing service capacities for your center: {getCenterName(user.center_id)}
+                </p>
+              )}
             </div>
             <div className="mt-4 md:mt-0">
               <Button
@@ -207,7 +223,7 @@ const AdminServiceCapacityPage: React.FC = () => {
                     ))}
                   </Table.Body>
                 </Table>
-                
+
                 {totalPages > 1 && (
                   <div className="py-4 px-6 flex justify-center">
                     <Pagination

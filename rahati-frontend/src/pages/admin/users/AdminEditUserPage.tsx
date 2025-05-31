@@ -1,20 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { MainLayout } from '../../../layouts';
-import { Card, Button, Input, Select, Textarea, Alert } from '../../../components/ui';
+import { Card, Button, Input, Select, Textarea, Alert, Spinner } from '../../../components/ui';
 import { useAuth } from '../../../hooks';
 import { useForm } from '../../../hooks';
 import { isValidEmail, isValidPhone } from '../../../utils/validationUtils';
 import { motion } from 'framer-motion';
+import { usersAPI, centersAPI } from '../../../services/api';
+import { User, Center, UserRole } from '../../../types';
 
 interface EditUserFormValues {
   name: string;
   email: string;
-  role: 'Patient' | 'Provider' | 'Admin';
+  role: UserRole;
   phone: string;
   address: string;
-  status: 'active' | 'inactive';
-  notes: string;
+  is_active: boolean;
+  center_id?: number;
+  caregiver_name?: string;
+  caregiver_phone?: string;
+  notes?: string;
 }
 
 const AdminEditUserPage: React.FC = () => {
@@ -22,37 +27,73 @@ const AdminEditUserPage: React.FC = () => {
   const { user } = useAuth('Admin');
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const [centers, setCenters] = useState<Center[]>([]);
   const [initialValues, setInitialValues] = useState<EditUserFormValues>({
     name: '',
     email: '',
     role: 'Patient',
     phone: '',
     address: '',
-    status: 'active',
+    is_active: true,
+    center_id: undefined,
+    caregiver_name: '',
+    caregiver_phone: '',
     notes: ''
   });
 
-  // Mock fetch user data
+  // Fetch centers for dropdown
   useEffect(() => {
-    setIsLoading(true);
-    // Simulate API call
-    setTimeout(() => {
-      // Mock user data
-      const mockUser: EditUserFormValues = {
-        name: 'John Doe',
-        email: 'john.doe@example.com',
-        role: 'Patient',
-        phone: '(555) 123-4567',
-        address: '123 Main St, Anytown, CA 12345',
-        status: 'active',
-        notes: 'Regular patient with good compliance to treatment.'
-      };
+    const fetchCenters = async () => {
+      try {
+        const response = await centersAPI.getCenters();
+        setCenters(response.data.data || response.data);
+      } catch (err) {
+        console.error('Error fetching centers:', err);
+      }
+    };
 
-      setInitialValues(mockUser);
-      setIsLoading(false);
-    }, 1000);
+    fetchCenters();
+  }, []);
+
+  // Fetch user data from API
+  useEffect(() => {
+    const fetchUserData = async () => {
+      setIsLoading(true);
+      setError(null);
+
+      try {
+        if (!id) return;
+
+        const response = await usersAPI.getUserById(Number(id));
+        const userData = response.data.data || response.data;
+
+        // Map API response to form values
+        const formValues: EditUserFormValues = {
+          name: userData.name || '',
+          email: userData.email || '',
+          role: userData.role as UserRole,
+          phone: userData.phone || '',
+          address: userData.address || '',
+          is_active: userData.is_active !== undefined ? userData.is_active : true,
+          center_id: userData.center_id,
+          caregiver_name: userData.caregiver_name || '',
+          caregiver_phone: userData.caregiver_phone || '',
+          notes: userData.notes || ''
+        };
+
+        setInitialValues(formValues);
+      } catch (err: any) {
+        console.error('Error fetching user data:', err);
+        setError(err.response?.data?.message || 'Failed to load user data. Please try again.');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchUserData();
   }, [id]);
 
   // Form validation
@@ -77,29 +118,54 @@ const AdminEditUserPage: React.FC = () => {
       errors.phone = 'Invalid phone number format';
     }
 
+    if (values.caregiver_phone && !isValidPhone(values.caregiver_phone)) {
+      errors.caregiver_phone = 'Invalid caregiver phone number format';
+    }
+
+    if ((values.role === 'Admin' || values.role === 'Provider') && !values.center_id) {
+      errors.center_id = 'Center is required for Admin and Provider users';
+    }
+
     return errors;
   };
 
   // Handle form submission
-  const handleSubmit = (values: EditUserFormValues, resetForm: () => void) => {
+  const handleSubmit = async (values: EditUserFormValues, resetForm: () => void) => {
     setError(null);
+    setIsSaving(true);
 
-    // Simulate API call
-    setTimeout(() => {
-      try {
-        console.log('Updating user:', values);
+    try {
+      if (!id) return;
 
-        // Mock successful response
-        setSuccess('User updated successfully');
+      // Prepare data for API
+      const userData = {
+        name: values.name,
+        email: values.email,
+        role: values.role,
+        phone: values.phone || null,
+        address: values.address || null,
+        is_active: values.is_active,
+        center_id: (values.role === 'Admin' || values.role === 'Provider') ? values.center_id : null,
+        caregiver_name: values.role === 'Patient' ? values.caregiver_name : null,
+        caregiver_phone: values.role === 'Patient' ? values.caregiver_phone : null,
+        notes: values.notes || null
+      };
 
-        // Redirect to user details after 2 seconds
-        setTimeout(() => {
-          navigate(`/admin/users/${id}`);
-        }, 2000);
-      } catch (err) {
-        setError('Failed to update user. Please try again.');
-      }
-    }, 1000);
+      // Call API to update user
+      await usersAPI.updateUser(Number(id), userData);
+
+      setSuccess('User updated successfully');
+
+      // Redirect to user details after 2 seconds
+      setTimeout(() => {
+        navigate(`/admin/users/${id}`);
+      }, 2000);
+    } catch (err: any) {
+      console.error('Error updating user:', err);
+      setError(err.response?.data?.message || 'Failed to update user. Please try again.');
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   // Initialize form with fetched values
@@ -116,28 +182,27 @@ const AdminEditUserPage: React.FC = () => {
     }
   }, [initialValues, isLoading, setMultipleFields]);
 
-  // Role options
+  // Role options - only superusers can create other superusers
   const roleOptions = [
     { value: 'Patient', label: 'Patient' },
     { value: 'Provider', label: 'Healthcare Provider' },
-    { value: 'Admin', label: 'Administrator' }
+    { value: 'Admin', label: 'Administrator' },
+    ...(user?.role === 'Superuser' ? [{ value: 'Superuser', label: 'Superuser' }] : [])
   ];
 
   // Status options
   const statusOptions = [
-    { value: 'active', label: 'Active' },
-    { value: 'inactive', label: 'Inactive' }
+    { value: true, label: 'Active' },
+    { value: false, label: 'Inactive' }
   ];
 
   if (isLoading) {
     return (
       <MainLayout>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="flex justify-center py-12">
-            <svg className="animate-spin h-8 w-8 text-primary-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-            </svg>
+          <div className="flex justify-center items-center py-12">
+            <Spinner size="lg" />
+            <span className="ml-3 text-[var(--color-text-secondary)]">Loading user data...</span>
           </div>
         </div>
       </MainLayout>
@@ -245,26 +310,71 @@ const AdminEditUserPage: React.FC = () => {
                       value={values.role}
                       onChange={handleChange}
                       onBlur={handleBlur}
-                      options={roleOptions}
                       error={touched.role && errors.role}
-                    />
+                    >
+                      {roleOptions.map(option => (
+                        <option key={option.value} value={option.value}>
+                          {option.label}
+                        </option>
+                      ))}
+                    </Select>
                   </div>
 
                   <div>
-                    <label htmlFor="status" className="block text-sm font-medium text-gray-700 mb-1">
+                    <label htmlFor="is_active" className="block text-sm font-medium text-gray-700 mb-1">
                       Status *
                     </label>
                     <Select
-                      id="status"
-                      name="status"
-                      value={values.status}
-                      onChange={handleChange}
+                      id="is_active"
+                      name="is_active"
+                      value={values.is_active.toString()}
+                      onChange={(e) => {
+                        handleChange({
+                          target: {
+                            name: 'is_active',
+                            value: e.target.value === 'true'
+                          }
+                        } as React.ChangeEvent<HTMLSelectElement>);
+                      }}
                       onBlur={handleBlur}
-                      options={statusOptions}
-                      error={touched.status && errors.status}
-                    />
+                      error={touched.is_active && errors.is_active}
+                    >
+                      <option value="true">Active</option>
+                      <option value="false">Inactive</option>
+                    </Select>
                   </div>
                 </div>
+
+                {(values.role === 'Admin' || values.role === 'Provider') && (
+                  <div>
+                    <label htmlFor="center_id" className="block text-sm font-medium text-gray-700 mb-1">
+                      Healthcare Center *
+                    </label>
+                    <Select
+                      id="center_id"
+                      name="center_id"
+                      value={values.center_id?.toString() || ''}
+                      onChange={(e) => {
+                        const value = e.target.value ? parseInt(e.target.value) : undefined;
+                        handleChange({
+                          target: {
+                            name: 'center_id',
+                            value
+                          }
+                        } as React.ChangeEvent<HTMLSelectElement>);
+                      }}
+                      onBlur={handleBlur}
+                      error={touched.center_id && errors.center_id}
+                    >
+                      <option value="">Select a center</option>
+                      {centers.map(center => (
+                        <option key={center.id} value={center.id}>
+                          {center.name}
+                        </option>
+                      ))}
+                    </Select>
+                  </div>
+                )}
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
@@ -298,6 +408,39 @@ const AdminEditUserPage: React.FC = () => {
                   </div>
                 </div>
 
+                {values.role === 'Patient' && (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <label htmlFor="caregiver_name" className="block text-sm font-medium text-gray-700 mb-1">
+                        Caregiver Name
+                      </label>
+                      <Input
+                        id="caregiver_name"
+                        name="caregiver_name"
+                        value={values.caregiver_name || ''}
+                        onChange={handleChange}
+                        onBlur={handleBlur}
+                        placeholder="Enter caregiver name"
+                        error={touched.caregiver_name && errors.caregiver_name}
+                      />
+                    </div>
+                    <div>
+                      <label htmlFor="caregiver_phone" className="block text-sm font-medium text-gray-700 mb-1">
+                        Caregiver Phone
+                      </label>
+                      <Input
+                        id="caregiver_phone"
+                        name="caregiver_phone"
+                        value={values.caregiver_phone || ''}
+                        onChange={handleChange}
+                        onBlur={handleBlur}
+                        placeholder="Enter caregiver phone"
+                        error={touched.caregiver_phone && errors.caregiver_phone}
+                      />
+                    </div>
+                  </div>
+                )}
+
                 <div>
                   <label htmlFor="notes" className="block text-sm font-medium text-gray-700 mb-1">
                     Notes
@@ -305,7 +448,7 @@ const AdminEditUserPage: React.FC = () => {
                   <Textarea
                     id="notes"
                     name="notes"
-                    value={values.notes}
+                    value={values.notes || ''}
                     onChange={handleChange}
                     onBlur={handleBlur}
                     placeholder="Enter any additional notes"
@@ -325,7 +468,8 @@ const AdminEditUserPage: React.FC = () => {
                   <Button
                     type="submit"
                     variant="primary"
-                    isLoading={isSubmitting}
+                    isLoading={isSaving}
+                    disabled={isSaving}
                   >
                     Save Changes
                   </Button>
@@ -350,12 +494,24 @@ const AdminEditUserPage: React.FC = () => {
               <div>
                 <Button
                   variant="secondary"
-                  onClick={() => {
-                    // Simulate password reset
-                    setTimeout(() => {
+                  onClick={async () => {
+                    try {
+                      setIsSaving(true);
+                      setError(null);
+
+                      // Call API to reset password
+                      await usersAPI.resetPassword(Number(id));
+
                       setSuccess('Password reset email sent to the user');
-                    }, 1000);
+                    } catch (err: any) {
+                      console.error('Error resetting password:', err);
+                      setError(err.response?.data?.message || 'Failed to reset password. Please try again.');
+                    } finally {
+                      setIsSaving(false);
+                    }
                   }}
+                  isLoading={isSaving}
+                  disabled={isSaving}
                 >
                   Reset Password
                 </Button>

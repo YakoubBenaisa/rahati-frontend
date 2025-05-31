@@ -3,6 +3,7 @@ import { MainLayout } from '../../../layouts';
 import { Card, Button, Alert, Select, Input } from '../../../components/ui';
 import { useAuth } from '../../../hooks';
 import { motion } from 'framer-motion';
+import { scheduleAPI } from '../../../services/api';
 
 interface TimeSlot {
   day: string;
@@ -28,55 +29,102 @@ const ProviderSchedulePage: React.FC = () => {
     'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'
   ];
 
-  // Mock fetch schedule data
+  // Default schedule for all days
+  const defaultSchedule: TimeSlot[] = daysOfWeek.map(day => ({
+    day,
+    startTime: '09:00',
+    endTime: '17:00',
+    isAvailable: false
+  }));
+
+  // Fetch provider schedule data
   useEffect(() => {
-    setIsLoading(true);
-    // Simulate API call
-    setTimeout(() => {
-      const mockSchedule: TimeSlot[] = [
-        { day: 'Monday', startTime: '09:00', endTime: '17:00', isAvailable: true },
-        { day: 'Tuesday', startTime: '09:00', endTime: '17:00', isAvailable: true },
-        { day: 'Wednesday', startTime: '09:00', endTime: '17:00', isAvailable: true },
-        { day: 'Thursday', startTime: '09:00', endTime: '17:00', isAvailable: true },
-        { day: 'Friday', startTime: '09:00', endTime: '13:00', isAvailable: true },
-        { day: 'Saturday', startTime: '10:00', endTime: '14:00', isAvailable: false },
-        { day: 'Sunday', startTime: '00:00', endTime: '00:00', isAvailable: false },
-      ];
-      setSchedule(mockSchedule);
-      setIsLoading(false);
-    }, 1000);
-  }, []);
+    if (!user?.id) return;
+
+    const fetchSchedule = async () => {
+      setIsLoading(true);
+      setError(null);
+
+      try {
+        const response = await scheduleAPI.getProviderSchedule(user.id);
+        const scheduleData = response.data.data || response.data;
+
+        // Transform API data to our TimeSlot format
+        // If the API doesn't return data for all days, create default entries
+        const daysData = scheduleData || [];
+
+        // Create a map of existing days
+        const daysMap = daysData.reduce((acc: Record<string, TimeSlot>, item: any) => {
+          acc[item.day] = {
+            day: item.day,
+            startTime: item.start_time || '09:00',
+            endTime: item.end_time || '17:00',
+            isAvailable: item.is_available || false
+          };
+          return acc;
+        }, {});
+
+        // Ensure all days of the week are included
+        const fullSchedule = daysOfWeek.map(day => {
+          if (daysMap[day]) {
+            return daysMap[day];
+          }
+
+          // Default values for days not in the API response
+          return {
+            day,
+            startTime: '09:00',
+            endTime: '17:00',
+            isAvailable: false
+          };
+        });
+
+        setSchedule(fullSchedule);
+      } catch (err: any) {
+        console.error('Error fetching provider schedule:', err);
+        setError(err.response?.data?.message || 'Failed to load schedule. Please try again.');
+
+        // Use default schedule if API call fails
+        setSchedule(defaultSchedule);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchSchedule();
+  }, [user, daysOfWeek, defaultSchedule]);
 
   // Handle form submission
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
+    if (!user?.id) return;
+
     // Validate times
     if (startTime >= endTime) {
       setError('End time must be after start time');
       return;
     }
 
-    if (isEditing && editingIndex !== null) {
-      // Update existing time slot
-      const updatedSchedule = [...schedule];
-      updatedSchedule[editingIndex] = {
-        day: selectedDay,
-        startTime,
-        endTime,
-        isAvailable: true
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      // Prepare time slot data
+      const timeSlotData = {
+        start_time: startTime,
+        end_time: endTime,
+        is_available: true
       };
-      setSchedule(updatedSchedule);
-      setSuccess('Schedule updated successfully');
-      resetForm();
-    } else {
-      // Check if day already exists
-      const existingDayIndex = schedule.findIndex(slot => slot.day === selectedDay);
-      
-      if (existingDayIndex !== -1) {
-        // Update existing day
+
+      // Update time slot in API
+      await scheduleAPI.updateProviderAvailability(user.id, selectedDay, timeSlotData);
+
+      // Update local state
+      if (isEditing && editingIndex !== null) {
+        // Update existing time slot
         const updatedSchedule = [...schedule];
-        updatedSchedule[existingDayIndex] = {
+        updatedSchedule[editingIndex] = {
           day: selectedDay,
           startTime,
           endTime,
@@ -84,29 +132,71 @@ const ProviderSchedulePage: React.FC = () => {
         };
         setSchedule(updatedSchedule);
       } else {
-        // Add new day
-        setSchedule([
-          ...schedule,
-          {
+        // Check if day already exists
+        const existingDayIndex = schedule.findIndex(slot => slot.day === selectedDay);
+
+        if (existingDayIndex !== -1) {
+          // Update existing day
+          const updatedSchedule = [...schedule];
+          updatedSchedule[existingDayIndex] = {
             day: selectedDay,
             startTime,
             endTime,
             isAvailable: true
-          }
-        ]);
+          };
+          setSchedule(updatedSchedule);
+        } else {
+          // Add new day
+          setSchedule([
+            ...schedule,
+            {
+              day: selectedDay,
+              startTime,
+              endTime,
+              isAvailable: true
+            }
+          ]);
+        }
       }
-      
-      setSuccess('Schedule updated successfully');
+
+      setSuccess(`Schedule for ${selectedDay} updated successfully`);
       resetForm();
+    } catch (err: any) {
+      console.error('Error updating time slot:', err);
+      setError(err.response?.data?.message || 'Failed to update schedule. Please try again.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
   // Toggle availability for a day
-  const toggleAvailability = (index: number) => {
-    const updatedSchedule = [...schedule];
-    updatedSchedule[index].isAvailable = !updatedSchedule[index].isAvailable;
-    setSchedule(updatedSchedule);
-    setSuccess('Availability updated successfully');
+  const toggleAvailability = async (index: number) => {
+    if (!user?.id) return;
+
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const slot = schedule[index];
+      const newAvailability = !slot.isAvailable;
+
+      // Update availability in API
+      await scheduleAPI.updateProviderAvailability(user.id, slot.day, {
+        is_available: newAvailability
+      });
+
+      // Update local state
+      const updatedSchedule = [...schedule];
+      updatedSchedule[index].isAvailable = newAvailability;
+      setSchedule(updatedSchedule);
+
+      setSuccess(`Availability for ${slot.day} ${newAvailability ? 'enabled' : 'disabled'} successfully`);
+    } catch (err: any) {
+      console.error('Error updating availability:', err);
+      setError(err.response?.data?.message || 'Failed to update availability. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   // Edit a time slot
@@ -129,15 +219,33 @@ const ProviderSchedulePage: React.FC = () => {
   };
 
   // Save entire schedule
-  const saveSchedule = () => {
+  const saveSchedule = async () => {
+    if (!user?.id) return;
+
     setIsLoading(true);
-    // Simulate API call
-    setTimeout(() => {
-      setIsLoading(false);
+    setError(null);
+
+    try {
+      // Transform schedule data to API format
+      const scheduleData = schedule.map(slot => ({
+        day: slot.day,
+        start_time: slot.startTime,
+        end_time: slot.endTime,
+        is_available: slot.isAvailable
+      }));
+
+      // Send schedule data to API
+      await scheduleAPI.updateProviderSchedule(user.id, { schedule: scheduleData });
+
       setSuccess('Schedule saved successfully');
       // Clear success message after 3 seconds
       setTimeout(() => setSuccess(null), 3000);
-    }, 1000);
+    } catch (err: any) {
+      console.error('Error saving schedule:', err);
+      setError(err.response?.data?.message || 'Failed to save schedule. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -221,7 +329,7 @@ const ProviderSchedulePage: React.FC = () => {
                   >
                     {isEditing ? 'Update' : 'Add'}
                   </Button>
-                  
+
                   {isEditing && (
                     <Button
                       type="button"
@@ -267,8 +375,8 @@ const ProviderSchedulePage: React.FC = () => {
                         <div className="flex items-center justify-between">
                           <div className="flex items-center">
                             <div className={`flex-shrink-0 h-10 w-10 rounded-full flex items-center justify-center ${
-                              slot.isAvailable 
-                                ? 'bg-green-100 text-green-600' 
+                              slot.isAvailable
+                                ? 'bg-green-100 text-green-600'
                                 : 'bg-red-100 text-red-600'
                             }`}>
                               {slot.day.charAt(0)}
@@ -276,8 +384,8 @@ const ProviderSchedulePage: React.FC = () => {
                             <div className="ml-4">
                               <div className="text-sm font-medium text-gray-900">{slot.day}</div>
                               <div className="text-sm text-gray-500">
-                                {slot.isAvailable 
-                                  ? `${slot.startTime} - ${slot.endTime}` 
+                                {slot.isAvailable
+                                  ? `${slot.startTime} - ${slot.endTime}`
                                   : 'Not Available'}
                               </div>
                             </div>
@@ -285,7 +393,7 @@ const ProviderSchedulePage: React.FC = () => {
                           <div className="flex space-x-2">
                             <Button
                               size="sm"
-                              variant={slot.isAvailable ? "danger" : "success"}
+                              variant={slot.isAvailable ? "danger" : "primary"}
                               onClick={() => toggleAvailability(index)}
                             >
                               {slot.isAvailable ? 'Set Unavailable' : 'Set Available'}
