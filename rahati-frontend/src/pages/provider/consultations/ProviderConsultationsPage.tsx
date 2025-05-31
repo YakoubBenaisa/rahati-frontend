@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { MainLayout } from '../../../layouts';
-import { Card, Button, Input, Badge, Select, Spinner, Alert } from '../../../components/ui';
+import { Card, Button, Input, Badge, Select } from '../../../components/ui';
 import { useAuth } from '../../../hooks';
 import { motion } from 'framer-motion';
 import { consultationsAPI } from '../../../services/api';
-import { formatDate } from '../../../utils/dateUtils';
 import { Consultation as ApiConsultation, ConsultationStatus } from '../../../types';
 
 // Define a local interface that matches our UI needs

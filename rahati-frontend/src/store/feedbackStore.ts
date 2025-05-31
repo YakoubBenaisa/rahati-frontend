@@ -16,7 +16,7 @@ interface FeedbackState {
   clearError: () => void;
 }
 
-export const useFeedbackStore = create<FeedbackState>((set, get) => ({
+export const useFeedbackStore = create<FeedbackState>((set) => ({
   feedbackList: [],
   selectedFeedback: null,
   isLoading: false,

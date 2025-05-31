@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { useAuth } from '../hooks';
 import { useAuthStore, useNotificationStore } from '../store';
 import { ThemeToggle } from '../components/ui';
 
@@ -13,7 +12,6 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   const { user, isAuthenticated, logout } = useAuthStore();
   const { notifications, unreadCount } = useNotificationStore();
   const location = useLocation();
-  const navigate = useNavigate();
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);

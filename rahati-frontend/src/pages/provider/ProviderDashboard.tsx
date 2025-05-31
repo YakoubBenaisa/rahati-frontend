@@ -6,7 +6,7 @@ import { Card, Button, Badge, Alert } from '../../components/ui';
 import { useAuth } from '../../hooks';
 import { useAppointmentStore } from '../../store/appointmentStore';
 import { useDashboardStore } from '../../store';
-import { formatDate, formatDateTime } from '../../utils';
+import { formatDateTime } from '../../utils';
 import { Appointment, AppointmentStatus } from '../../types';
 
 interface ProviderDashboardProps {

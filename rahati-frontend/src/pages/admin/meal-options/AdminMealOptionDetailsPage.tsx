@@ -10,7 +10,6 @@ import { formatDate } from '../../../utils/dateUtils';
 
 const AdminMealOptionDetailsPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const { user } = useAuth('Admin');
   const navigate = useNavigate();
   
   const [mealOption, setMealOption] = useState<MealOption | null>(null);
@@ -154,30 +153,30 @@ const AdminMealOptionDetailsPage: React.FC = () => {
         )}
 
         {showDeleteConfirm && (
-          <Alert
-            variant="warning"
-            message="Are you sure you want to delete this meal option? This action cannot be undone."
-            className="mb-6"
-            actions={
-              <div className="flex space-x-3 mt-3">
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => setShowDeleteConfirm(false)}
-                >
-                  Cancel
-                </Button>
-                <Button
-                  size="sm"
-                  variant="danger"
-                  isLoading={isDeleting}
-                  onClick={handleDelete}
-                >
-                  Delete
-                </Button>
-              </div>
-            }
-          />
+          <>
+            <Alert
+              variant="warning"
+              message="Are you sure you want to delete this meal option? This action cannot be undone."
+              className="mb-6"
+            />
+            <div className="flex space-x-3 mt-3">
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => setShowDeleteConfirm(false)}
+              >
+                Cancel
+              </Button>
+              <Button
+                size="sm"
+                variant="danger"
+                isLoading={isDeleting}
+                onClick={handleDelete}
+              >
+                Delete
+              </Button>
+            </div>
+          </>
         )}
 
         {mealOption && (
@@ -192,7 +191,7 @@ const AdminMealOptionDetailsPage: React.FC = () => {
                   <div>
                     <h2 className="text-2xl font-semibold text-[var(--color-text-primary)]">{mealOption.name}</h2>
                     <div className="mt-2 flex items-center">
-                      <Badge variant={mealOption.is_active ? 'success' : 'error'}>
+                      <Badge variant={mealOption.is_active ? 'active' : 'inactive'}>
                         {mealOption.is_active ? 'Active' : 'Inactive'}
                       </Badge>
                       <span className="ml-4 text-[var(--color-text-secondary)]">

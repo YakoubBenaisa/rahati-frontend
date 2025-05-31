@@ -5,7 +5,6 @@ import { MainLayout } from '../../../layouts';
 import { Button, Alert, Input, Select, Textarea } from '../../../components/ui';
 import { useAuth } from '../../../hooks';
 import { useTransportationStore, useAppointmentStore } from '../../../store';
-import { Appointment } from '../../../types';
 
 interface BookTransportationFormValues {
   appointment_id: number | null;
@@ -25,7 +24,6 @@ const PatientBookTransportation: React.FC = () => {
   const { user } = useAuth('Patient');
   const { 
     createTransportationRequest, 
-    isLoading: transportationLoading, 
     error: transportationError 
   } = useTransportationStore();
   
@@ -45,7 +43,7 @@ const PatientBookTransportation: React.FC = () => {
     special_requirements: ''
   });
   
-  const [errors, setErrors] = useState<Partial<BookTransportationFormValues>>({});
+  const [errors, setErrors] = useState<Partial<Record<keyof BookTransportationFormValues, string>>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -64,7 +62,7 @@ const PatientBookTransportation: React.FC = () => {
       if (selectedAppointment?.center?.name) {
         setFormValues(prev => ({
           ...prev,
-          dropoff_location: selectedAppointment.center.name + (selectedAppointment.center.address ? `, ${selectedAppointment.center.address}` : '')
+          dropoff_location: selectedAppointment.center?.name + (selectedAppointment.center?.address ? `, ${selectedAppointment.center.address}` : '')
         }));
       }
     }
@@ -101,8 +99,8 @@ const PatientBookTransportation: React.FC = () => {
   };
 
   // Validate form
-  const validateForm = (): Partial<BookTransportationFormValues> => {
-    const newErrors: Partial<BookTransportationFormValues> = {};
+  const validateForm = (): Partial<Record<keyof BookTransportationFormValues, string>> => {
+      const newErrors: Partial<Record<keyof BookTransportationFormValues, string>> = {};
     
     if (!formValues.pickup_location) {
       newErrors.pickup_location = 'Pickup location is required';
@@ -161,11 +159,7 @@ const PatientBookTransportation: React.FC = () => {
     }
   };
 
-  // Format date for min attribute
-  const getTodayFormatted = () => {
-    const today = new Date();
-    return today.toISOString().split('T')[0];
-  };
+
 
   // Format datetime for min attribute
   const getNowFormatted = () => {

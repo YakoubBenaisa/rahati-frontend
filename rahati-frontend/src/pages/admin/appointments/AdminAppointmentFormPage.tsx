@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { MainLayout } from '../../../layouts';
-import { Card, Button, Input, Select, Textarea, Alert, Spinner, DatePicker, TimePicker } from '../../../components/ui';
+import { Card, Button, Input, Select, Textarea, Alert, Spinner } from '../../../components/ui';
 import { useAuth } from '../../../hooks';
 import { motion } from 'framer-motion';
 import { appointmentsAPI, usersAPI, centersAPI } from '../../../services/api';
-import { Appointment, User, Center, AppointmentStatus } from '../../../types';
-import { formatDate } from '../../../utils/dateUtils';
+import {  User, Center, AppointmentStatus } from '../../../types';
 
 interface AppointmentFormValues {
   patient_id: number | null;
@@ -67,7 +66,7 @@ const AdminAppointmentFormPage: React.FC = () => {
           setProviders(providersData);
 
           // If the currently selected provider is not in the new list, clear it
-          if (formValues.provider_id && !providersData.some(p => p.id === formValues.provider_id)) {
+          if (formValues.provider_id && !providersData.some((p: { id: number | null; }) => p.id === formValues.provider_id)) {
             setFormValues(prev => ({
               ...prev,
               provider_id: null

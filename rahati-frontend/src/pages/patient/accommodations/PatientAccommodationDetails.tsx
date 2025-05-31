@@ -59,7 +59,44 @@ const PatientAccommodationDetails: React.FC = () => {
     setTimeout(() => {
       
       
-      setAccommodation();
+      setAccommodation({
+        id: 1,
+        center: {
+          id: 1,
+          name: 'Mock Center',
+          address: '123 Mock Street',
+          phone: '123-456-7890',
+        },
+        room: {
+          id: 1,
+          roomNumber: '101',
+          type: 'Deluxe',
+          description: 'A deluxe room with all amenities.',
+          pricePerNight: 100,
+          isAccessible: true,
+        },
+        checkInDate: new Date().toISOString(),
+        checkOutDate: new Date(new Date().getTime() + 86400000).toISOString(),
+        numberOfNights: 1,
+        numberOfGuests: 2,
+        status: 'confirmed',
+        totalPrice: 100,
+        mealOption: {
+          id: 1,
+          name: 'Breakfast',
+          description: 'Continental breakfast',
+          price: 20,
+        },
+        specialRequests: 'Late check-in',
+        appointment: {
+          id: 1,
+          date: new Date().toISOString(),
+          time: '10:00 AM',
+          provider: 'Dr. Mock',
+        },
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      });
       setIsLoading(false);
     }, 1000);
   }, [id]);

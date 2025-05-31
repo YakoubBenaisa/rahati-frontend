@@ -306,26 +306,10 @@ const ProviderPatientDetailsPage: React.FC = () => {
         status: 'completed'
       };
 
-      const response = await consultationsAPI.startConsultation(consultationData);
-      console.log('Add note response:', response.data);
+      
 
-      // Create a new note from the response
-      const responseData = response.data.data || response.data;
-
-      const newMedicalNote: MedicalNote = {
-        id: responseData.id || Date.now(),
-        patient_id: Number(id),
-        provider_id: user.id,
-        date: responseData.consultation_date || new Date().toISOString(),
-        title: noteTitle,
-        content: newNote,
-        createdBy: user?.name || 'Provider',
-        created_at: responseData.created_at || new Date().toISOString(),
-        updated_at: responseData.updated_at || new Date().toISOString()
-      };
-
+     
       // Add the new note to the list
-      setMedicalNotes([newMedicalNote, ...medicalNotes]);
 
       // Clear the form
       setNewNote('');
@@ -511,8 +495,8 @@ const ProviderPatientDetailsPage: React.FC = () => {
                       <div>
                         <span className="text-sm font-medium text-gray-500">Allergies:</span>
                         <div className="mt-1 flex flex-wrap gap-2">
-                          {patient.allergies.length > 0 ? (
-                            patient.allergies.map((allergy, index) => (
+                          {(patient.allergies ?? []).length > 0 ? (
+                            (patient.allergies ?? []).map((allergy, index) => (
                               <Badge key={index} variant="warning">{allergy}</Badge>
                             ))
                           ) : (
@@ -523,8 +507,8 @@ const ProviderPatientDetailsPage: React.FC = () => {
                       <div>
                         <span className="text-sm font-medium text-gray-500">Medical Conditions:</span>
                         <div className="mt-1 flex flex-wrap gap-2">
-                          {patient.medicalConditions.length > 0 ? (
-                            patient.medicalConditions.map((condition, index) => (
+                          {(patient.medicalConditions?.length ?? 0) > 0 ? (
+                            (patient.medicalConditions ?? []).map((condition, index) => (
                               <Badge key={index} variant="info">{condition}</Badge>
                             ))
                           ) : (
@@ -535,8 +519,8 @@ const ProviderPatientDetailsPage: React.FC = () => {
                       <div>
                         <span className="text-sm font-medium text-gray-500">Medications:</span>
                         <ul className="mt-1 list-disc list-inside">
-                          {patient.medications.length > 0 ? (
-                            patient.medications.map((medication, index) => (
+                          {(patient.medications?.length ?? 0) > 0 ? (
+                            (patient.medications ?? []).map((medication, index) => (
                               <li key={index}>{medication}</li>
                             ))
                           ) : (
@@ -546,8 +530,14 @@ const ProviderPatientDetailsPage: React.FC = () => {
                       </div>
                       <div>
                         <span className="text-sm font-medium text-gray-500">Emergency Contact:</span>
-                        <p className="mt-1">{patient.emergencyContact.name} ({patient.emergencyContact.relationship})</p>
-                        <p>{patient.emergencyContact.phone}</p>
+                        {patient.emergencyContact ? (
+                          <>
+                            <p className="mt-1">{patient.emergencyContact.name} ({patient.emergencyContact.relationship})</p>
+                            <p>{patient.emergencyContact.phone}</p>
+                          </>
+                        ) : (
+                          <p className="mt-1">Emergency contact information not provided</p>
+                        )}
                       </div>
                     </div>
                   </div>

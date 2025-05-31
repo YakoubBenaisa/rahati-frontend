@@ -16,7 +16,7 @@ interface TransportationState {
   clearError: () => void;
 }
 
-export const useTransportationStore = create<TransportationState>((set, get) => ({
+export const useTransportationStore = create<TransportationState>((set) => ({
   transportationRequests: [],
   selectedTransportationRequest: null,
   isLoading: false,

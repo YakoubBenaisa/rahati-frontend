@@ -1,6 +1,5 @@
 import React, { ButtonHTMLAttributes, forwardRef } from 'react';
 import { Link, LinkProps } from 'react-router-dom';
-import { motion } from 'framer-motion';
 
 export type ButtonVariant = 'primary' | 'secondary' | 'accent' | 'outline' | 'ghost' | 'link' | 'danger';
 export type ButtonSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
@@ -15,6 +14,7 @@ interface ButtonBaseProps {
   fullWidth?: boolean;
   children?: React.ReactNode;
   className?: string;
+  disabled?: boolean;
 }
 
 // Props for regular button
@@ -101,10 +101,6 @@ const Button = forwardRef<HTMLButtonElement | HTMLAnchorElement, CombinedButtonP
   );
 
   // Animation props
-  const animationProps = {
-    whileTap: { scale: disabled || isLoading ? 1 : 0.98 },
-    whileHover: { scale: disabled || isLoading ? 1 : 1.02 },
-  };
 
   // Render as Link
   if (Component === Link) {
@@ -124,7 +120,7 @@ const Button = forwardRef<HTMLButtonElement | HTMLAnchorElement, CombinedButtonP
     <Component
       className={buttonClasses}
       disabled={disabled || isLoading}
-      ref={ref as React.Ref<HTMLButtonElement>}
+      ref={Component === Link ? (ref as React.Ref<HTMLAnchorElement | null>) : (ref as React.Ref<HTMLButtonElement | null>)}
       {...rest}
     >
       {content}

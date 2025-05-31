@@ -2,10 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { MainLayout } from '../../../layouts';
-import { Button, Card, Badge, Alert } from '../../../components/ui';
+import { Button, Badge, Alert } from '../../../components/ui';
 import { useAuth } from '../../../hooks';
 import { useFeedbackStore } from '../../../store';
-import { Feedback } from '../../../types';
 
 const PatientFeedback: React.FC = () => {
   const { user } = useAuth('Patient');

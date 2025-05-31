@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { Link, useLocation } from 'react-router-dom';
 import { useAuthStore, useNotificationStore } from '../store';
 import { ThemeToggle } from '../components/ui';
 
@@ -12,7 +11,6 @@ const PatientDashboardLayout: React.FC<PatientDashboardLayoutProps> = ({ childre
   const { user, logout } = useAuthStore();
   const { notifications, unreadCount } = useNotificationStore();
   const location = useLocation();
-  const navigate = useNavigate();
   
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);

@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { MainLayout } from '../../../layouts';
 import { Card, Button, Alert, Spinner, Badge } from '../../../components/ui';
-import { useAuth } from '../../../hooks';
 import { motion } from 'framer-motion';
 import { roomsAPI } from '../../../services/api';
 import { Room } from '../../../types';
@@ -10,7 +9,6 @@ import { formatDate } from '../../../utils/dateUtils';
 
 const AdminRoomDetailsPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const { user } = useAuth('Admin');
   const navigate = useNavigate();
   
   const [room, setRoom] = useState<Room | null>(null);
@@ -154,30 +152,30 @@ const AdminRoomDetailsPage: React.FC = () => {
         )}
 
         {showDeleteConfirm && (
-          <Alert
-            variant="warning"
-            message="Are you sure you want to delete this room? This action cannot be undone."
-            className="mb-6"
-            actions={
-              <div className="flex space-x-3 mt-3">
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => setShowDeleteConfirm(false)}
-                >
-                  Cancel
-                </Button>
-                <Button
-                  size="sm"
-                  variant="danger"
-                  isLoading={isDeleting}
-                  onClick={handleDelete}
-                >
-                  Delete
-                </Button>
-              </div>
-            }
-          />
+          <>
+            <Alert
+              variant="warning"
+              message="Are you sure you want to delete this room? This action cannot be undone."
+              className="mb-6"
+            />
+            <div className="flex space-x-3 mt-3">
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => setShowDeleteConfirm(false)}
+              >
+                Cancel
+              </Button>
+              <Button
+                size="sm"
+                variant="danger"
+                isLoading={isDeleting}
+                onClick={handleDelete}
+              >
+                Delete
+              </Button>
+            </div>
+          </>
         )}
 
         {room && (

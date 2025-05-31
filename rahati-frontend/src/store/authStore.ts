@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { User, UserRole, AuthResponse } from '../types';
+import { User } from '../types';
 import { authAPI } from '../services/api';
 
 // Helper function to get dashboard URL based on user role
@@ -82,7 +82,7 @@ export const useAuthStore = create<AuthState>()(
         // Extract data from response
         // The API might return data directly or nested in a data property
         const responseData = response.data.data || response.data;
-        const { token: apiToken, userId, role } = responseData;
+        const { token: apiToken, role } = responseData;
 
         if (!apiToken) {
           throw new Error('No token received from server');
@@ -151,7 +151,7 @@ export const useAuthStore = create<AuthState>()(
           // Extract data from response
           // The API might return data directly or nested in a data property
           const responseData = response.data.data || response.data;
-          const { token: apiToken, userId, role } = responseData;
+          const { token: apiToken, role } = responseData;
 
           if (!apiToken) {
             throw new Error('No token received from server');

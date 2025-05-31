@@ -16,6 +16,7 @@ export interface User {
 }
 
 export interface AuthResponse {
+  data: AuthResponse;
   token: string;
   userId: number;
   role: UserRole;

@@ -2,17 +2,14 @@ import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { MainLayout } from '../../../layouts';
 import { Button, Alert } from '../../../components/ui';
-import { useAuth } from '../../../hooks';
 import { useNotificationStore } from '../../../store';
-import { Notification } from '../../../types';
 
 const PatientNotifications: React.FC = () => {
-  const { user } = useAuth('Patient');
   const { 
     notifications, 
     fetchNotifications, 
     markAsRead, 
-    markAllAsRead,
+    
     isLoading, 
     error: notificationError 
   } = useNotificationStore();
@@ -69,7 +66,10 @@ const PatientNotifications: React.FC = () => {
   // Handle mark all as read
   const handleMarkAllAsRead = async () => {
     try {
-      await markAllAsRead();
+      const unreadNotifications = notifications.filter(n => !n.is_read);
+      for (const notification of unreadNotifications) {
+        await markAsRead(notification.id);
+      }
       setSuccess(true);
       
       // Clear success message after a delay

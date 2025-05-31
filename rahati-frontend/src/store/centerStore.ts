@@ -16,7 +16,7 @@ interface CenterState {
   clearError: () => void;
 }
 
-export const useCenterStore = create<CenterState>((set, get) => ({
+export const useCenterStore = create<CenterState>((set) => ({
   centers: [],
   selectedCenter: null,
   isLoading: false,

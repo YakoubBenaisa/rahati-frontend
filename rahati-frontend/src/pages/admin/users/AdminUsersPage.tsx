@@ -314,7 +314,7 @@ const AdminUsersPage: React.FC = () => {
                         {user.phone || 'N/A'}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {user.created_at ? formatDate(user.created_at) : 'N/A'}
+                        {user.created_at ? formatDate(user.created_at, 'datetime') : 'N/A'}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                         <div className="flex justify-end space-x-2">

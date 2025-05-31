@@ -243,34 +243,42 @@ const AdminMealOptionFormPage: React.FC = () => {
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div>
-                  <Switch
-                    label="Vegetarian"
-                    checked={formData.is_vegetarian || false}
-                    onChange={(checked) => handleSwitchChange('is_vegetarian', checked)}
-                  />
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Vegetarian</label>
+                    <Switch
+                      checked={formData.is_vegetarian || false}
+                      onChange={(checked) => handleSwitchChange('is_vegetarian', checked)}
+                    />
+                  </div>
                 </div>
                 <div>
-                  <Switch
-                    label="Vegan"
-                    checked={formData.is_vegan || false}
-                    onChange={(checked) => handleSwitchChange('is_vegan', checked)}
-                  />
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Vegan</label>
+                    <Switch
+                      checked={formData.is_vegan || false}
+                      onChange={(checked) => handleSwitchChange('is_vegan', checked)}
+                    />
+                  </div>
                 </div>
                 <div>
-                  <Switch
-                    label="Gluten-Free"
-                    checked={formData.is_gluten_free || false}
-                    onChange={(checked) => handleSwitchChange('is_gluten_free', checked)}
-                  />
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Gluten-Free</label>
+                    <Switch
+                      checked={formData.is_gluten_free || false}
+                      onChange={(checked) => handleSwitchChange('is_gluten_free', checked)}
+                    />
+                  </div>
                 </div>
               </div>
 
               <div>
-                <Switch
-                  label="Active"
-                  checked={formData.is_active || false}
-                  onChange={(checked) => handleSwitchChange('is_active', checked)}
-                />
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Active</label>
+                  <Switch
+                    checked={formData.is_active || false}
+                    onChange={(checked) => handleSwitchChange('is_active', checked)}
+                  />
+                </div>
                 <p className="mt-1 text-sm text-[var(--color-text-tertiary)]">
                   Inactive meal options will not be available for selection.
                 </p>

@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { MainLayout } from '../../../layouts';
 import { Card, Button, Input, Badge, Spinner, Alert } from '../../../components/ui';
-import { useAuth } from '../../../hooks';
 import { motion } from 'framer-motion';
 import { usersAPI, appointmentsAPI } from '../../../services/api';
 import { formatDate } from '../../../utils/dateUtils';
@@ -19,7 +18,6 @@ interface Patient {
 }
 
 const ProviderPatientsPage: React.FC = () => {
-  const { user } = useAuth('Provider');
   const [isLoading, setIsLoading] = useState(false);
   const [patients, setPatients] = useState<Patient[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
@@ -180,7 +178,7 @@ const ProviderPatientsPage: React.FC = () => {
         patient =>
           patient.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
           patient.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          patient.phone.includes(searchTerm)
+          (patient.phone ?? '').includes(searchTerm)
       );
       setFilteredPatients(filtered);
     }

@@ -59,7 +59,7 @@ const RegisterPage: React.FC = () => {
 
   // Form validation
   const validateForm = (values: RegisterFormValues) => {
-    const errors: Partial<RegisterFormValues> = {};
+      const errors: Partial<Omit<RegisterFormValues, 'role'> & { role?: string }> = {};
 
     if (!values.name) {
       errors.name = 'Name is required';

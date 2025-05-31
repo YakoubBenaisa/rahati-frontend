@@ -2,9 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { MainLayout } from '../../../layouts';
 import { Button, Alert, Input, Textarea } from '../../../components/ui';
-import { useAuth } from '../../../hooks';
 import { useUserStore } from '../../../store';
-import { User } from '../../../types';
 
 interface ProfileFormValues {
   name: string;
@@ -16,7 +14,6 @@ interface ProfileFormValues {
 }
 
 const PatientProfile: React.FC = () => {
-  const { user: authUser } = useAuth('Patient');
   const { 
     currentUser, 
     fetchCurrentUser, 

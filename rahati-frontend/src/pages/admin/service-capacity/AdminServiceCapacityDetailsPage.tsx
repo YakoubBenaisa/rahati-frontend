@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { MainLayout } from '../../../layouts';
 import { Card, Button, Alert, Spinner, Badge } from '../../../components/ui';
-import { useAuth } from '../../../hooks';
 import { motion } from 'framer-motion';
 import { serviceCapacityAPI, centersAPI } from '../../../services/api';
 import { ServiceCapacity, Center } from '../../../types';
@@ -10,7 +9,6 @@ import { formatDate } from '../../../utils/dateUtils';
 
 const AdminServiceCapacityDetailsPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const { user } = useAuth('Admin');
   const navigate = useNavigate();
   
   const [serviceCapacity, setServiceCapacity] = useState<ServiceCapacity | null>(null);
@@ -165,30 +163,30 @@ const AdminServiceCapacityDetailsPage: React.FC = () => {
         )}
 
         {showDeleteConfirm && (
-          <Alert
-            variant="warning"
-            message="Are you sure you want to delete this service capacity? This action cannot be undone."
-            className="mb-6"
-            actions={
-              <div className="flex space-x-3 mt-3">
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => setShowDeleteConfirm(false)}
-                >
-                  Cancel
-                </Button>
-                <Button
-                  size="sm"
-                  variant="danger"
-                  isLoading={isDeleting}
-                  onClick={handleDelete}
-                >
-                  Delete
-                </Button>
-              </div>
-            }
-          />
+          <>
+            <Alert
+              variant="warning"
+              message="Are you sure you want to delete this service capacity? This action cannot be undone."
+              className="mb-6"
+            />
+            <div className="flex space-x-3 mt-3">
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => setShowDeleteConfirm(false)}
+              >
+                Cancel
+              </Button>
+              <Button
+                size="sm"
+                variant="danger"
+                isLoading={isDeleting}
+                onClick={handleDelete}
+              >
+                Delete
+              </Button>
+            </div>
+          </>
         )}
 
         {serviceCapacity && (

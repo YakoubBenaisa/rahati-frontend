@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import { MainLayout } from '../../../layouts';
 import { Card, Button, Alert, Spinner, Badge } from '../../../components/ui';
-import { useAuth } from '../../../hooks';
 import { motion } from 'framer-motion';
 import { appointmentsAPI, usersAPI, centersAPI } from '../../../services/api';
 import { Appointment, User, Center, AppointmentStatus } from '../../../types';
@@ -10,7 +9,6 @@ import { formatDate } from '../../../utils/dateUtils';
 
 const AdminAppointmentDetailsPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const { user } = useAuth(['Admin', 'Superuser']);
   const navigate = useNavigate();
   
   const [appointment, setAppointment] = useState<Appointment | null>(null);
@@ -274,7 +272,7 @@ const AdminAppointmentDetailsPage: React.FC = () => {
                       <div>
                         <span className="text-sm font-medium text-[var(--color-text-secondary)]">Date & Time:</span>
                         <p className="mt-1 text-[var(--color-text-primary)]">
-                          {formatDate(appointment.appointment_datetime, 'datetime')}
+                          {formatDate(appointment.appointment_datetime)}
                         </p>
                       </div>
                       <div>

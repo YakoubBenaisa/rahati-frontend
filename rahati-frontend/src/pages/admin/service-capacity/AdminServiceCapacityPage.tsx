@@ -191,7 +191,7 @@ const AdminServiceCapacityPage: React.FC = () => {
                         <Table.Cell>{capacity.id}</Table.Cell>
                         <Table.Cell>{getCenterName(capacity.center_id)}</Table.Cell>
                         <Table.Cell>{capacity.service_type}</Table.Cell>
-                        <Table.Cell>{formatDate(capacity.date)}</Table.Cell>
+                        <Table.Cell>{formatDate(capacity.date, 'date')}</Table.Cell>
                         <Table.Cell>
                           {formatDate(capacity.start_time, 'time')} - {formatDate(capacity.end_time, 'time')}
                         </Table.Cell>

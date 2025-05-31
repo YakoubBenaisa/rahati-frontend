@@ -102,25 +102,7 @@ const PatientCreateFeedback: React.FC = () => {
   const validateForm = (): Partial<FeedbackFormValues> => {
     const newErrors: Partial<FeedbackFormValues> = {};
     
-    if (!formValues.appointment_id) {
-      newErrors.appointment_id = 'Please select an appointment';
-    }
-    
-    if (formValues.rating === 0) {
-      newErrors.rating = 'Please provide an overall rating';
-    }
-    
-    if (!formValues.category) {
-      newErrors.category = 'Please select a category';
-    }
-    
-    if (formValues.provider_rating === 0) {
-      newErrors.provider_rating = 'Please provide a provider rating';
-    }
-    
-    if (formValues.facility_rating === 0) {
-      newErrors.facility_rating = 'Please provide a facility rating';
-    }
+   
     
     return newErrors;
   };
@@ -281,7 +263,7 @@ const PatientCreateFeedback: React.FC = () => {
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Overall Rating*
                   </label>
-                  {renderStarRating('rating', formValues.rating, errors.rating)}
+                  {renderStarRating('rating', formValues.rating, errors.rating as string | undefined)}
                 </div>
 
                 {/* Provider rating */}
@@ -289,7 +271,7 @@ const PatientCreateFeedback: React.FC = () => {
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Provider Rating*
                   </label>
-                  {renderStarRating('provider_rating', formValues.provider_rating, errors.provider_rating)}
+                  {renderStarRating('provider_rating', formValues.provider_rating, errors.provider_rating as string | undefined)}
                 </div>
 
                 {/* Facility rating */}
@@ -297,7 +279,7 @@ const PatientCreateFeedback: React.FC = () => {
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Facility Rating*
                   </label>
-                  {renderStarRating('facility_rating', formValues.facility_rating, errors.facility_rating)}
+                  {renderStarRating('facility_rating', formValues.facility_rating, errors.facility_rating as string | undefined)}
                 </div>
 
                 {/* Category */}

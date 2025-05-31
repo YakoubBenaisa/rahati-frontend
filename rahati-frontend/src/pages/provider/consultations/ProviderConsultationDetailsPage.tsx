@@ -50,13 +50,13 @@ const ProviderConsultationDetailsPage: React.FC = () => {
     setTimeout(() => {
       //  consultation data
      
-      setConsultation(Consultation);
-      setDiagnosis(kConsultation.diagnosis || '');
-      setTreatmentPlan(Consultation.treatmentPlan || '');
-      setFollowUpRequired(Consultation.followUpRequired);
-      setFollowUpDate(Consultation.followUpDate || '');
-      setNotes(Consultation.notes || '');
-      setMedications(Consultation.medications || []);
+      setConsultation(consultation);
+      setDiagnosis(consultation ? consultation.diagnosis || '' : '');
+      setTreatmentPlan(consultation ? consultation.treatmentPlan || '' : '');
+      setFollowUpRequired(consultation ? consultation.followUpRequired || false : false);
+      setFollowUpDate(consultation ? consultation.followUpDate || '' : '');
+      setNotes(consultation ? consultation.notes || '' : '');
+      setMedications(consultation ? consultation.medications || [] : []);
       setIsLoading(false);
     }, 1000);
   }, [id]);

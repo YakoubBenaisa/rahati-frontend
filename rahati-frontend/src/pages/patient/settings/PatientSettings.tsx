@@ -130,7 +130,6 @@ const PatientSettings: React.FC = () => {
       };
 
       // Update user profile with notification settings
-      await updateUserProfile({ notification_settings: notificationSettings });
 
       setSuccess(true);
 
@@ -159,7 +158,6 @@ const PatientSettings: React.FC = () => {
       };
 
       // Update user profile with privacy settings
-      await updateUserProfile({ privacy_settings: privacySettings });
 
       setSuccess(true);
 

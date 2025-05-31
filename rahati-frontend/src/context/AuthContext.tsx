@@ -37,7 +37,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     
     if (token && userRole) {
      
-      setUser();
+      setUser({
+        id: 'mock-id',
+        name: 'Mock User',
+        email: 'mock@example.com',
+        role: userRole as 'Patient' | 'Provider' | 'Admin',
+      });
       setIsAuthenticated(true);
     }
     
@@ -47,7 +52,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   // Login function
   const login = (role: string) => {
     // Create a mock user based on the role
-    
+    const mockUser: User = {
+      id: 'mock-id',
+      name: 'Mock User',
+      email: 'mock@example.com',
+      role: role as 'Patient' | 'Provider' | 'Admin',
+    };
     
     localStorage.setItem('token', 'mock-token');
     localStorage.setItem('userRole', role);

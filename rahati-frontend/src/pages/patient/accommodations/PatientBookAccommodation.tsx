@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { MainLayout } from '../../../layouts';
 import { Card, Button, Input, Select, Textarea, Alert } from '../../../components/ui';
-import { useAuth } from '../../../hooks';
 import { useForm } from '../../../hooks';
 import { motion } from 'framer-motion';
 import { appointmentsAPI, centersAPI, accommodationsAPI, roomsAPI, mealOptionsAPI } from '../../../services/api';
@@ -35,7 +34,6 @@ interface BookAccommodationFormValues {
 }
 
 const PatientBookAccommodation: React.FC = () => {
-  const { user } = useAuth('Patient');
   const navigate = useNavigate();
   const location = useLocation();
   const [isLoading, setIsLoading] = useState(false);
@@ -74,7 +72,7 @@ const PatientBookAccommodation: React.FC = () => {
 
         // If appointment ID is provided in query, set center ID based on that appointment
         if (appointmentIdFromQuery) {
-          const appointment = formattedData.find(a => a.id === Number(appointmentIdFromQuery));
+          const appointment = formattedData.find((a: { id: number; }) => a.id === Number(appointmentIdFromQuery));
           if (appointment) {
             setFieldValue('center_id', appointment.centerId.toString());
           }

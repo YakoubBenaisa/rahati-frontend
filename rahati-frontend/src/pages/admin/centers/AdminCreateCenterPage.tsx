@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MainLayout } from '../../../layouts';
-import { Card, Button, Input, Select, Textarea, Alert } from '../../../components/ui';
+import { Card, Button, Input, Textarea, Alert } from '../../../components/ui';
 import { useAuth } from '../../../hooks';
 import { useForm } from '../../../hooks';
 import { useCenterStore } from '../../../store/centerStore';
@@ -21,7 +21,6 @@ interface CreateCenterFormValues {
 }
 
 const AdminCreateCenterPage: React.FC = () => {
-  const { user } = useAuth('Admin');
   const navigate = useNavigate();
   const { createCenter, isLoading, error: storeError, clearError } = useCenterStore();
   const [error, setError] = useState<string | null>(null);
@@ -71,7 +70,7 @@ const AdminCreateCenterPage: React.FC = () => {
   };
 
   // Handle form submission
-  const handleSubmit = async (values: CreateCenterFormValues, resetForm: () => void) => {
+  const handleSubmit = async (values: CreateCenterFormValues) => {
     setError(null);
     clearError();
 

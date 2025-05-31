@@ -281,7 +281,7 @@ const AdminServiceCapacityFormPage: React.FC = () => {
                     value={formData.center_id?.toString() || ''}
                     onChange={(e) => setFormData(prev => ({ ...prev, center_id: Number(e.target.value) }))}
                     required
-                    disabled={user?.role === 'Admin' && user?.center_id}
+                    disabled={user?.role === 'Admin' && !!user?.center_id}
                   >
                     <option value="">Select a center</option>
                     {centers.map(center => (
@@ -378,11 +378,13 @@ const AdminServiceCapacityFormPage: React.FC = () => {
               </div>
 
               <div>
-                <Switch
-                  label="Active"
-                  checked={formData.is_active || false}
-                  onChange={(checked) => handleSwitchChange('is_active', checked)}
-                />
+                <div className="flex items-center space-x-2">
+                  <span className="text-sm text-[var(--color-text-primary)]">Active</span>
+                  <Switch
+                    checked={formData.is_active || false}
+                    onChange={(checked) => handleSwitchChange('is_active', checked)}
+                  />
+                </div>
                 <p className="mt-1 text-sm text-[var(--color-text-tertiary)]">
                   Inactive service capacities will not be available for booking.
                 </p>

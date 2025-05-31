@@ -61,16 +61,16 @@ const ContactPage: React.FC = () => {
   };
 
   // Initialize form
-  const { values, errors, touched, handleChange, handleBlur, handleSubmit: submitForm, resetForm } = useForm<ContactFormValues>({
-    initialValues: {
+  const { values, errors, touched, handleChange, handleBlur, handleSubmit: submitForm, resetForm } = useForm<ContactFormValues>(
+    {
       name: '',
       email: '',
       subject: '',
       message: '',
     },
-    validate,
-    onSubmit: handleSubmit,
-  });
+    handleSubmit,
+    validate
+  );
 
   return (
     <MainLayout>

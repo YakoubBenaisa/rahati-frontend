@@ -1,15 +1,13 @@
-import React, { useEffect, useState } from 'react';
-import { Link, useParams, useNavigate } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { Link, useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { MainLayout } from '../../../layouts';
 import { Button, Alert } from '../../../components/ui';
-import { useAuth } from '../../../hooks';
 import { usePaymentStore } from '../../../store';
 
 const PatientPaymentDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const navigate = useNavigate();
-  const { user } = useAuth('Patient');
+
   const { 
     selectedPayment: payment, 
     fetchPaymentById, 

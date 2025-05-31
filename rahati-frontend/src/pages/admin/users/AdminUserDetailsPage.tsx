@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import { MainLayout } from '../../../layouts';
-import { Card, Button, Badge, Alert, Tabs, Tab, Spinner } from '../../../components/ui';
+import { Card, Button, Badge, Alert, Tabs, Tab } from '../../../components/ui';
 import { useAuth } from '../../../hooks';
 import { motion } from 'framer-motion';
 import { usersAPI, centersAPI, appointmentsAPI } from '../../../services/api';
@@ -273,7 +273,7 @@ const AdminUserDetailsPage: React.FC = () => {
               </Button>
               <Button
                 onClick={handleDeactivateUser}
-                variant={userDetails.is_active ? 'danger' : 'success'}
+                variant={userDetails.is_active ? 'error' : 'primary'}
                 isLoading={isDeactivating}
               >
                 {userDetails.is_active ? 'Deactivate' : 'Activate'}

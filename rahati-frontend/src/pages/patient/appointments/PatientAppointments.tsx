@@ -2,11 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { MainLayout } from '../../../layouts';
-import { Button, Card, Badge, Alert } from '../../../components/ui';
+import { Button, Alert } from '../../../components/ui';
 import { useAuth } from '../../../hooks';
 import { useAppointmentStore } from '../../../store';
 
-import { Appointment } from '../../../types';
 
 const PatientAppointments: React.FC = () => {
   const { user } = useAuth('Patient');

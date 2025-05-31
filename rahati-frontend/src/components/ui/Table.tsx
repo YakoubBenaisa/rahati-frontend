@@ -20,10 +20,7 @@ const Table: React.FC<TableProps> & {
 } = ({
   children,
   className = '',
-  striped = true,
-  hoverable = true,
   bordered = false,
-  compact = false,
 }) => {
   return (
     <div className="overflow-x-auto">

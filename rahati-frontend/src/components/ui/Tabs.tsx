@@ -24,18 +24,19 @@ const Tabs: React.FC<TabsProps> = ({ children, activeTab, onChange, className = 
   ) as React.ReactElement[];
 
   // Get active tab content
-  const activeTabContent = tabs.find((tab) => tab.props.id === activeTab)?.props.children;
+  const activeTabContent = tabs.find((tab) => (tab.props as TabProps).id === activeTab)?.props.children;
 
   return (
     <div className={className}>
       <div className="border-b border-gray-200">
         <nav className="-mb-px flex space-x-8">
           {tabs.map((tab) => {
-            const isActive = tab.props.id === activeTab;
+            const tabElement = tab as React.ReactElement<TabProps>;
+            const isActive = tabElement.props.id === activeTab;
             return (
               <button
-                key={tab.props.id}
-                onClick={() => onChange(tab.props.id)}
+                key={tabElement.props.id}
+                onClick={() => onChange(tabElement.props.id)}
                 className={`
                   whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm
                   ${
@@ -46,7 +47,7 @@ const Tabs: React.FC<TabsProps> = ({ children, activeTab, onChange, className = 
                 `}
                 aria-current={isActive ? 'page' : undefined}
               >
-                {tab.props.label}
+                {tabElement.props.label}
               </button>
             );
           })}

@@ -2,10 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { MainLayout } from '../../../layouts';
-import { Button, Card, Badge, Alert } from '../../../components/ui';
+import { Button, Alert } from '../../../components/ui';
 import { useAuth } from '../../../hooks';
 import { useTransportationStore } from '../../../store';
-import { TransportationRequest } from '../../../types';
 
 const PatientTransportation: React.FC = () => {
   const { user } = useAuth('Patient');

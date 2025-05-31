@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { MainLayout } from '../../../layouts';
 import { Card, Button, Badge, Input, Select, Alert } from '../../../components/ui';
-import { useAuth } from '../../../hooks';
 import { motion } from 'framer-motion';
 import { accommodationsAPI } from '../../../services/api';
 
@@ -18,7 +17,6 @@ interface Accommodation {
 }
 
 const PatientAccommodations: React.FC = () => {
-  const { user } = useAuth('Patient');
   const [isLoading, setIsLoading] = useState(false);
   const [accommodations, setAccommodations] = useState<Accommodation[]>([]);
   const [filteredAccommodations, setFilteredAccommodations] = useState<Accommodation[]>([]);

@@ -36,11 +36,9 @@ export const useForm = <T extends Record<string, any>>(
     }
 
     // Clear error when field is changed
-    if (errors[name as keyof T]) {
-      setErrors({
-        ...errors,
-        [name]: undefined,
-      });
+    if (errors[name as string]) {
+      const { [name]: _, ...restErrors } = errors;
+      setErrors(restErrors);
     }
   };
 
@@ -58,7 +56,7 @@ export const useForm = <T extends Record<string, any>>(
       const validationErrors = validate(values);
       setErrors(prev => ({
         ...prev,
-        [name]: validationErrors[name as keyof T],
+        [name]: validationErrors[name as string],
       }));
     }
   };
@@ -113,11 +111,11 @@ export const useForm = <T extends Record<string, any>>(
     }));
 
     // Clear error when field is changed
-    if (errors[field]) {
-      setErrors(prev => ({
-        ...prev,
-        [field]: undefined,
-      }));
+    if (errors[field as string]) {
+      setErrors(prev => {
+        const { [field]: _, ...rest } = prev;
+        return rest;
+      });
     }
   };
 
@@ -131,8 +129,8 @@ export const useForm = <T extends Record<string, any>>(
     // Clear errors for changed fields
     const clearedErrors = { ...errors };
     Object.keys(newValues).forEach(key => {
-      if (clearedErrors[key as keyof T]) {
-        clearedErrors[key as keyof T] = undefined;
+      if (clearedErrors[key as string]) {
+        delete clearedErrors[key as string];
       }
     });
 

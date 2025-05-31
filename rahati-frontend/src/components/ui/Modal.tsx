@@ -1,7 +1,6 @@
 import React, { Fragment } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { motion } from 'framer-motion';
-import Button from './Button';
 
 interface ModalProps {
   isOpen: boolean;
@@ -50,7 +49,7 @@ const Modal: React.FC<ModalProps> = ({
             leaveFrom="opacity-100"
             leaveTo="opacity-0"
           >
-            <Dialog.Overlay className="fixed inset-0 bg-black bg-opacity-30" />
+            <div className="fixed inset-0 bg-black bg-opacity-30" />
           </Transition.Child>
           
           {/* This element is to trick the browser into centering the modal contents. */}

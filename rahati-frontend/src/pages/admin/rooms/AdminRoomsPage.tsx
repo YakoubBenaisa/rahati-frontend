@@ -2,13 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MainLayout } from '../../../layouts';
 import { Card, Button, Alert, Spinner, Badge, Table, Pagination } from '../../../components/ui';
-import { useAuth } from '../../../hooks';
 import { motion } from 'framer-motion';
 import { roomsAPI } from '../../../services/api';
 import { Room } from '../../../types';
 
 const AdminRoomsPage: React.FC = () => {
-  const { user } = useAuth('Admin');
   const navigate = useNavigate();
   const [rooms, setRooms] = useState<Room[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);

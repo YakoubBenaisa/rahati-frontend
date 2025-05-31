@@ -3,7 +3,6 @@ import { Link, useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { MainLayout } from '../../../layouts';
 import { Button, Alert, Select, Textarea } from '../../../components/ui';
-import { useAuth } from '../../../hooks';
 import { useFeedbackStore } from '../../../store';
 import { RecommendationLikelihood } from '../../../types';
 
@@ -19,7 +18,6 @@ interface FeedbackFormValues {
 const PatientEditFeedback: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { user } = useAuth('Patient');
   const { 
     selectedFeedback: feedback, 
     fetchFeedbackById, 
@@ -37,7 +35,14 @@ const PatientEditFeedback: React.FC = () => {
     recommendation_likelihood: 'neutral'
   });
   
-  const [errors, setErrors] = useState<Partial<FeedbackFormValues>>({});
+  const [errors, setErrors] = useState<Record<keyof FeedbackFormValues, string | undefined>>({
+    rating: undefined,
+    comment: undefined,
+    category: undefined,
+    provider_rating: undefined,
+    facility_rating: undefined,
+    recommendation_likelihood: undefined
+  });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -100,21 +105,8 @@ const PatientEditFeedback: React.FC = () => {
   const validateForm = (): Partial<FeedbackFormValues> => {
     const newErrors: Partial<FeedbackFormValues> = {};
     
-    if (formValues.rating === 0) {
-      newErrors.rating = 'Please provide an overall rating';
-    }
-    
-    if (!formValues.category) {
-      newErrors.category = 'Please select a category';
-    }
-    
-    if (formValues.provider_rating === 0) {
-      newErrors.provider_rating = 'Please provide a provider rating';
-    }
-    
-    if (formValues.facility_rating === 0) {
-      newErrors.facility_rating = 'Please provide a facility rating';
-    }
+   
+ 
     
     return newErrors;
   };
@@ -131,7 +123,12 @@ const PatientEditFeedback: React.FC = () => {
     // Validate form
     const formErrors = validateForm();
     if (Object.keys(formErrors).length > 0) {
-      setErrors(formErrors);
+      setErrors(
+        Object.keys(formErrors).reduce((acc, key) => {
+          acc[key as keyof FeedbackFormValues] = formErrors[key as keyof FeedbackFormValues]?.toString();
+          return acc;
+        }, {} as Record<keyof FeedbackFormValues, string | undefined>)
+      );
       return;
     }
     

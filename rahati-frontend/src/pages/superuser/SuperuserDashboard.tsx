@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { MainLayout } from '../../layouts';
-import { Card, Button, Badge, Alert, Input, Select, Spinner } from '../../components/ui';
+import { Card, Button, Alert, Input, Select, Spinner } from '../../components/ui';
 import { useAuth } from '../../hooks';
 import { useForm } from '../../hooks';
 import { useDashboardStore } from '../../store';
@@ -407,7 +407,7 @@ const SuperuserDashboard: React.FC = () => {
                             name: 'center_id',
                             value
                           }
-                        } as React.ChangeEvent<HTMLSelectElement>);
+                        } as unknown as React.ChangeEvent<HTMLSelectElement>);
                       }}
                       onBlur={handleBlur}
                       error={touched.center_id && errors.center_id}

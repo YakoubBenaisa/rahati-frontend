@@ -7,7 +7,7 @@ import { useAuth } from '../../hooks';
 import { useAppointmentStore } from '../../store/appointmentStore';
 import { useCenterStore } from '../../store/centerStore';
 import { useDashboardStore } from '../../store';
-import { formatDate, formatDateTime, formatCurrency } from '../../utils';
+import { formatDateTime } from '../../utils';
 
 interface AdminDashboardProps {
   onLogout?: () => void;

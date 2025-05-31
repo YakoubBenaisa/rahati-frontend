@@ -5,7 +5,7 @@ import { Card, Button, Alert, Spinner, Badge, Table, Pagination } from '../../..
 import { useAuth } from '../../../hooks';
 import { motion } from 'framer-motion';
 import { appointmentsAPI, centersAPI } from '../../../services/api';
-import { Appointment, AppointmentStatus, Center } from '../../../types';
+import { Appointment } from '../../../types';
 import { formatDate } from '../../../utils/dateUtils';
 
 const AdminAppointmentsPage: React.FC = () => {

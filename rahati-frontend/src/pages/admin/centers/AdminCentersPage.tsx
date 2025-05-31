@@ -2,17 +2,15 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { MainLayout } from '../../../layouts';
 import { Card, Button, Input, Badge, Select, Alert } from '../../../components/ui';
-import { useAuth } from '../../../hooks';
 import { useCenterStore } from '../../../store/centerStore';
 import { motion } from 'framer-motion';
 import { Center } from '../../../types';
 import { useAuthStore } from '../../../store';
 
 const AdminCentersPage: React.FC = () => {
-  const { user } = useAuth('Admin');
   const authStore = useAuthStore();
   const navigate = useNavigate();
-  const { centers, fetchCenters, isLoading, error } = useCenterStore();
+  const { centers, fetchCenters, isLoading } = useCenterStore();
   const [filteredCenters, setFilteredCenters] = useState<Center[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');

@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { MainLayout } from '../../../layouts';
 import { Card, Button, Badge, Input, Select, Alert } from '../../../components/ui';
-import { useAuth } from '../../../hooks';
 import { motion } from 'framer-motion';
 import { consultationsAPI } from '../../../services/api';
 
@@ -17,7 +16,6 @@ interface Consultation {
 }
 
 const PatientConsultations: React.FC = () => {
-  const { user } = useAuth('Patient');
   const [isLoading, setIsLoading] = useState(false);
   const [consultations, setConsultations] = useState<Consultation[]>([]);
   const [filteredConsultations, setFilteredConsultations] = useState<Consultation[]>([]);
