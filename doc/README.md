@@ -40,20 +40,20 @@ Rahati is a comprehensive healthcare management platform designed to streamline 
 The following images correspond to the main sections (0 to 4) of the Rahati landing page. Each section is designed to engage users and highlight the platform's strengths.
 
 ### Section 0: Welcome & Introduction
-![Section 0](/doc/image.png)
+![Section 0](../doc/image.png)
 *Start your journey with Rahati. A welcoming introduction to the platform's mission and vision.*
 
 ### Section 1: Key Features Overview
-![Section 1](/doc/image3.png)
+![Section 1](../doc/image3.png)
 *Discover the core features that make Rahati a powerful healthcare management solution.*
 
 ### Section 2: Seamless Appointments
-![Section 2](/doc/image2.png)
+![Section 2](../doc/image2.png)
 *Effortlessly schedule and manage appointments with a user-friendly interface.*
 
 
 ### Section 3: Feedback & Real-Time Updates
-![Section 3](/doc/image4.png)
+![Section 3](../doc/image4.png)
 *Stay informed with notifications and provide feedback to continuously improve the experience.*
 
 ---
