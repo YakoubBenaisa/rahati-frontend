@@ -175,437 +175,307 @@ const AppContent: React.FC = () => {
       <Route
         path="/patient/dashboard"
         element={
-          <ProtectedRoute
-            element={<PatientDashboard />}
-            allowedRoles={['Patient']}
-          />
-        }
+           <PatientDashboard />}
+           
       />
 
       {/* Patient appointment routes */}
       <Route
         path="/patient/appointments"
-        element={
-          <ProtectedRoute
-            element={<PatientAppointments />}
-            allowedRoles={['Patient']}
-          />
-        }
+        element={<PatientAppointments />}
+            
       />
+        
 
       <Route
         path="/patient/appointments/:id"
-        element={
-          <ProtectedRoute
-            element={<PatientAppointmentDetails />}
-            allowedRoles={['Patient']}
-          />
-        }
+        element={<PatientAppointmentDetails />}
+            
       />
 
       <Route
         path="/patient/appointments/:id/reschedule"
-        element={
-          <ProtectedRoute
-            element={<PatientRescheduleAppointment />}
-            allowedRoles={['Patient']}
-          />
-        }
+        element={<PatientRescheduleAppointment />}
+           
       />
 
       <Route
         path="/patient/book-appointment"
-        element={
-          <ProtectedRoute
-            element={<PatientBookAppointment />}
-            allowedRoles={['Patient']}
-          />
-        }
+        element={<PatientBookAppointment />}
+           
+        
       />
 
       {/* Patient consultation routes */}
       <Route
         path="/patient/consultations"
         element={
-          <ProtectedRoute
-            element={<PatientConsultations />}
-            allowedRoles={['Patient']}
-          />
-        }
+          <PatientConsultations />}
       />
 
       <Route
         path="/patient/consultations/:id"
         element={
-          <ProtectedRoute
-            element={<PatientConsultationDetails />}
-            allowedRoles={['Patient']}
-          />
-        }
+         <PatientConsultationDetails />}
+           
       />
 
       {/* Patient accommodation routes */}
       <Route
         path="/patient/accommodations"
         element={
-          <ProtectedRoute
-            element={<PatientAccommodations />}
-            allowedRoles={['Patient']}
-          />
-        }
+         <PatientAccommodations />}
       />
 
       <Route
         path="/patient/accommodations/:id"
         element={
-          <ProtectedRoute
-            element={<PatientAccommodationDetails />}
-            allowedRoles={['Patient']}
-          />
-        }
+         <PatientAccommodationDetails />}
+           
       />
 
       <Route
         path="/patient/accommodations/book"
         element={
-          <ProtectedRoute
-            element={<PatientBookAccommodation />}
-            allowedRoles={['Patient']}
-          />
-        }
+         <PatientBookAccommodation />}
+           
       />
 
       {/* Patient transportation routes */}
       <Route
         path="/patient/transportation"
         element={
-          <ProtectedRoute
-            element={<PatientTransportation />}
-            allowedRoles={['Patient']}
-          />
-        }
+           <PatientTransportation />}
+           
       />
 
       <Route
         path="/patient/transportation/new"
         element={
-          <ProtectedRoute
-            element={<PatientBookTransportation />}
-            allowedRoles={['Patient']}
-          />
-        }
+          <PatientBookTransportation />}
+           
       />
 
       <Route
         path="/patient/transportation/:id/edit"
         element={
-          <ProtectedRoute
-            element={<PatientBookTransportation />}
-            allowedRoles={['Patient']}
-          />
-        }
+          <PatientBookTransportation />}
+           
       />
 
       <Route
         path="/patient/transportation/:id"
         element={
-          <ProtectedRoute
-            element={<PatientTransportationDetails />}
-            allowedRoles={['Patient']}
-          />
-        }
+          <PatientTransportationDetails />}
+           
       />
 
       {/* Patient payment routes */}
       <Route
         path="/patient/payments"
         element={
-          <ProtectedRoute
-            element={<PatientPayments />}
-            allowedRoles={['Patient']}
-          />
-        }
+           <PatientPayments />}
+           
       />
 
       <Route
         path="/patient/payments/:id"
         element={
-          <ProtectedRoute
-            element={<PatientPaymentDetails />}
-            allowedRoles={['Patient']}
-          />
-        }
+           <PatientPaymentDetails />}
+           
       />
 
       <Route
         path="/patient/payments/:id/pay"
         element={
-          <ProtectedRoute
-            element={<PatientPaymentProcess />}
-            allowedRoles={['Patient']}
-          />
-        }
+           <PatientPaymentProcess />}
+           
       />
 
       {/* Patient feedback routes */}
       <Route
         path="/patient/feedback"
         element={
-          <ProtectedRoute
-            element={<PatientFeedback />}
-            allowedRoles={['Patient']}
-          />
-        }
+           <PatientFeedback />}
+           
       />
 
       <Route
         path="/patient/feedback/new"
         element={
-          <ProtectedRoute
-            element={<PatientCreateFeedback />}
-            allowedRoles={['Patient']}
-          />
-        }
+           <PatientCreateFeedback />}
+           
       />
 
       <Route
         path="/patient/feedback/:id"
         element={
-          <ProtectedRoute
-            element={<PatientFeedbackDetails />}
-            allowedRoles={['Patient']}
-          />
-        }
+           <PatientFeedbackDetails />}
+           
       />
 
       <Route
         path="/patient/feedback/:id/edit"
         element={
-          <ProtectedRoute
-            element={<PatientEditFeedback />}
-            allowedRoles={['Patient']}
-          />
-        }
+           <PatientEditFeedback />}
+           
       />
 
       {/* Patient profile and settings */}
       <Route
         path="/patient/profile"
         element={
-          <ProtectedRoute
-            element={<PatientProfile />}
-            allowedRoles={['Patient']}
-          />
-        }
+           <PatientProfile />}
+           
       />
 
       <Route
         path="/patient/settings"
         element={
-          <ProtectedRoute
-            element={<PatientSettings />}
-            allowedRoles={['Patient']}
-          />
-        }
+           <PatientSettings />}
+           
       />
 
       <Route
         path="/patient/notifications"
         element={
-          <ProtectedRoute
-            element={<PatientNotifications />}
-            allowedRoles={['Patient']}
-          />
-        }
+           <PatientNotifications />}
+           
       />
 
       {/* Provider routes */}
       <Route
         path="/provider/dashboard"
         element={
-          <ProtectedRoute
-            element={<ProviderDashboard onLogout={logout} />}
-            allowedRoles={['Provider']}
-          />
-        }
+           <ProviderDashboard onLogout={logout} />}
+           
       />
 
       {/* Provider schedule routes */}
       <Route
         path="/provider/schedule"
         element={
-          <ProtectedRoute
-            element={<ProviderSchedulePage />}
-            allowedRoles={['Provider']}
-          />
-        }
+           <ProviderSchedulePage />}
+           
       />
 
       {/* Provider patients routes */}
       <Route
         path="/provider/patients"
         element={
-          <ProtectedRoute
-            element={<ProviderPatientsPage />}
-            allowedRoles={['Provider']}
-          />
-        }
+           <ProviderPatientsPage />}
+           
       />
 
       <Route
         path="/provider/patients/:id"
         element={
-          <ProtectedRoute
-            element={<ProviderPatientDetailsPage />}
-            allowedRoles={['Provider']}
-          />
-        }
+           <ProviderPatientDetailsPage />}
+           
       />
 
       {/* Provider appointments routes */}
       <Route
         path="/provider/appointments"
         element={
-          <ProtectedRoute
-            element={<ProviderAppointmentsPage />}
-            allowedRoles={['Provider']}
-          />
-        }
+           <ProviderAppointmentsPage />}
+           
       />
 
       {/* Provider consultation routes */}
       <Route
         path="/provider/consultations"
         element={
-          <ProtectedRoute
-            element={<ProviderConsultationsPage />}
-            allowedRoles={['Provider']}
-          />
-        }
+           <ProviderConsultationsPage />}
+           
       />
 
       <Route
         path="/provider/consultations/:id"
         element={
-          <ProtectedRoute
-            element={<ProviderConsultationDetailsPage />}
-            allowedRoles={['Provider']}
-          />
-        }
+           <ProviderConsultationDetailsPage />}
+           
       />
 
       <Route
         path="/provider/consultations/new"
         element={
-          <ProtectedRoute
-            element={<ProviderNewConsultationPage />}
-            allowedRoles={['Provider']}
-          />
-        }
+           <ProviderNewConsultationPage />}
+           
       />
 
       {/* Admin routes */}
       <Route
         path="/admin/dashboard"
         element={
-          <ProtectedRoute
-            element={<AdminDashboard onLogout={logout} />}
-            allowedRoles={['Admin']}
-          />
-        }
+           <AdminDashboard onLogout={logout} />}
+          
       />
 
       {/* Superuser routes */}
       <Route
         path="/superuser/dashboard"
         element={
-          <ProtectedRoute
-            element={<SuperuserDashboard />}
-            allowedRoles={['Superuser']}
-          />
-        }
+           <SuperuserDashboard />}
+           
       />
 
       {/* Admin users routes */}
       <Route
         path="/admin/users"
         element={
-          <ProtectedRoute
-            element={<AdminUsersPage />}
-            allowedRoles={['Admin', 'Superuser']}
-          />
-        }
+           <AdminUsersPage />}
+           
       />
 
       <Route
         path="/admin/users/new"
         element={
-          <ProtectedRoute
-            element={<AdminCreateUserPage />}
-            allowedRoles={['Admin', 'Superuser']}
-          />
-        }
+           <AdminCreateUserPage />}
+           
       />
 
       <Route
         path="/admin/users/:id"
         element={
-          <ProtectedRoute
-            element={<AdminUserDetailsPage />}
-            allowedRoles={['Admin', 'Superuser']}
-          />
-        }
+           <AdminUserDetailsPage />}
+           
       />
 
       <Route
         path="/admin/users/:id/edit"
         element={
-          <ProtectedRoute
-            element={<AdminEditUserPage />}
-            allowedRoles={['Admin', 'Superuser']}
-          />
-        }
+           <AdminEditUserPage />}
+           
       />
 
       {/* Admin centers routes */}
       <Route
         path="/admin/centers"
         element={
-          <ProtectedRoute
-            element={<AdminCentersPage />}
-            allowedRoles={['Admin', 'Superuser']}
-          />
-        }
+           <AdminCentersPage />}
+           
       />
 
       <Route
         path="/admin/centers/new"
         element={
-          <ProtectedRoute
-            element={<AdminCreateCenterPage />}
-            allowedRoles={['Admin', 'Superuser']}
-          />
-        }
+           <AdminCreateCenterPage />}
+           
       />
 
       <Route
         path="/admin/centers/:id"
         element={
-          <ProtectedRoute
-            element={<AdminCenterDetailsPage />}
-            allowedRoles={['Admin', 'Superuser']}
-          />
-        }
+           <AdminCenterDetailsPage />}
+           
       />
 
       <Route
         path="/admin/centers/:id/edit"
         element={
-          <ProtectedRoute
-            element={<AdminEditCenterPage />}
-            allowedRoles={['Admin', 'Superuser']}
-          />
-        }
+           <AdminEditCenterPage />}
+           
       />
 
       {/* Removed duplicate route for /admin/centers */}
@@ -613,192 +483,135 @@ const AppContent: React.FC = () => {
       <Route
         path="/admin/appointments"
         element={
-          <ProtectedRoute
-            element={<AdminAppointmentsPage />}
-            allowedRoles={['Admin', 'Superuser']}
-          />
-        }
+           <AdminAppointmentsPage />}
+           
       />
 
       <Route
         path="/admin/appointments/new"
         element={
-          <ProtectedRoute
-            element={<AdminAppointmentFormPage />}
-            allowedRoles={['Admin', 'Superuser']}
-          />
-        }
+           <AdminAppointmentFormPage />}
+           
       />
 
       <Route
         path="/admin/appointments/:id"
         element={
-          <ProtectedRoute
-            element={<AdminAppointmentDetailsPage />}
-            allowedRoles={['Admin', 'Superuser']}
-          />
-        }
+           <AdminAppointmentDetailsPage />}
+           
       />
 
       <Route
         path="/admin/appointments/:id/edit"
         element={
-          <ProtectedRoute
-            element={<AdminAppointmentFormPage />}
-            allowedRoles={['Admin', 'Superuser']}
-          />
-        }
+           <AdminAppointmentFormPage />}
+           
       />
 
       <Route
         path="/admin/rooms"
         element={
-          <ProtectedRoute
-            element={<AdminRoomsPage />}
-            allowedRoles={['Admin', 'Superuser']}
-          />
-        }
+           <AdminRoomsPage />}
+           
       />
 
       <Route
         path="/admin/rooms/new"
         element={
-          <ProtectedRoute
-            element={<AdminRoomFormPage />}
-            allowedRoles={['Admin', 'Superuser']}
-          />
-        }
+           <AdminRoomFormPage />}
+           
       />
 
       <Route
         path="/admin/rooms/:id"
         element={
-          <ProtectedRoute
-            element={<AdminRoomDetailsPage />}
-            allowedRoles={['Admin', 'Superuser']}
-          />
-        }
+           <AdminRoomDetailsPage />}
+           
       />
 
       <Route
         path="/admin/rooms/:id/edit"
         element={
-          <ProtectedRoute
-            element={<AdminRoomFormPage />}
-            allowedRoles={['Admin', 'Superuser']}
-          />
-        }
+           <AdminRoomFormPage />}
+           
       />
 
       <Route
         path="/admin/meal-options"
         element={
-          <ProtectedRoute
-            element={<AdminMealOptionsPage />}
-            allowedRoles={['Admin', 'Superuser']}
-          />
-        }
+           <AdminMealOptionsPage />}
+           
       />
 
       <Route
         path="/admin/meal-options/new"
         element={
-          <ProtectedRoute
-            element={<AdminMealOptionFormPage />}
-            allowedRoles={['Admin', 'Superuser']}
-          />
-        }
+           <AdminMealOptionFormPage />}
+           
       />
 
       <Route
         path="/admin/meal-options/:id"
         element={
-          <ProtectedRoute
-            element={<AdminMealOptionDetailsPage />}
-            allowedRoles={['Admin', 'Superuser']}
-          />
-        }
+           <AdminMealOptionDetailsPage />}
+           
       />
 
       <Route
         path="/admin/meal-options/:id/edit"
         element={
-          <ProtectedRoute
-            element={<AdminMealOptionFormPage />}
-            allowedRoles={['Admin', 'Superuser']}
-          />
-        }
+           <AdminMealOptionFormPage />}
+           
       />
 
       <Route
         path="/admin/service-capacity"
         element={
-          <ProtectedRoute
-            element={<AdminServiceCapacityPage />}
-            allowedRoles={['Admin', 'Superuser']}
-          />
-        }
+           <AdminServiceCapacityPage />}
+           
       />
 
       <Route
         path="/admin/service-capacity/new"
         element={
-          <ProtectedRoute
-            element={<AdminServiceCapacityFormPage />}
-            allowedRoles={['Admin', 'Superuser']}
-          />
-        }
+           <AdminServiceCapacityFormPage />}
+           
       />
 
       <Route
         path="/admin/service-capacity/:id"
         element={
-          <ProtectedRoute
-            element={<AdminServiceCapacityDetailsPage />}
-            allowedRoles={['Admin', 'Superuser']}
-          />
-        }
+           <AdminServiceCapacityDetailsPage />}
+           
       />
 
       <Route
         path="/admin/service-capacity/:id/edit"
         element={
-          <ProtectedRoute
-            element={<AdminServiceCapacityFormPage />}
-            allowedRoles={['Admin', 'Superuser']}
-          />
-        }
+           <AdminServiceCapacityFormPage />}
+           
       />
 
       {/* Common protected routes */}
       <Route
         path="/profile"
         element={
-          <ProtectedRoute
-            element={<Navigate to={getDashboardRoute()} replace />}
-            allowedRoles={['Patient', 'Provider', 'Admin', 'Superuser']}
-          />
-        }
+           <Navigate to={getDashboardRoute()} replace />}
+           
       />
 
       <Route
         path="/settings"
         element={
-          <ProtectedRoute
-            element={<Navigate to={getDashboardRoute()} replace />}
-            allowedRoles={['Patient', 'Provider', 'Admin', 'Superuser']}
-          />
-        }
+           <Navigate to={getDashboardRoute()} replace />}
+           
       />
 
       <Route
         path="/notifications"
         element={
-          <ProtectedRoute
-            element={<Navigate to={getDashboardRoute()} replace />}
-            allowedRoles={['Patient', 'Provider', 'Admin', 'Superuser']}
-          />
-        }
+           <Navigate to={getDashboardRoute()} replace />}
+           
       />
 
       {/* Dashboard redirect */}
