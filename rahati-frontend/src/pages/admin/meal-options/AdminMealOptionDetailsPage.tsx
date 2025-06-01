@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { MainLayout } from '../../../layouts';
 import { Card, Button, Alert, Spinner, Badge } from '../../../components/ui';
-import { useAuth } from '../../../hooks';
+//import { useAuth } from '../../../hooks';
 import { motion } from 'framer-motion';
 import { mealOptionsAPI } from '../../../services/api';
 import { MealOption } from '../../../types';
@@ -191,7 +191,9 @@ const AdminMealOptionDetailsPage: React.FC = () => {
                   <div>
                     <h2 className="text-2xl font-semibold text-[var(--color-text-primary)]">{mealOption.name}</h2>
                     <div className="mt-2 flex items-center">
-                      <Badge variant={mealOption.is_active ? 'active' : 'inactive'}>
+                      <Badge 
+                      //variant={mealOption.is_active ? 'active' : 'inactive'}
+                      >
                         {mealOption.is_active ? 'Active' : 'Inactive'}
                       </Badge>
                       <span className="ml-4 text-[var(--color-text-secondary)]">
@@ -221,13 +223,13 @@ const AdminMealOptionDetailsPage: React.FC = () => {
                   <div>
                     <h3 className="text-sm font-medium text-[var(--color-text-tertiary)]">Created At</h3>
                     <p className="mt-1 text-[var(--color-text-secondary)]">
-                      {mealOption.created_at ? formatDate(mealOption.created_at, 'datetime') : 'N/A'}
+                      {mealOption.created_at ? formatDate(mealOption.created_at) : 'N/A'}
                     </p>
                   </div>
                   <div>
                     <h3 className="text-sm font-medium text-[var(--color-text-tertiary)]">Last Updated</h3>
                     <p className="mt-1 text-[var(--color-text-secondary)]">
-                      {mealOption.updated_at ? formatDate(mealOption.updated_at, 'datetime') : 'N/A'}
+                      {mealOption.updated_at ? formatDate(mealOption.updated_at) : 'N/A'}
                     </p>
                   </div>
                 </div>

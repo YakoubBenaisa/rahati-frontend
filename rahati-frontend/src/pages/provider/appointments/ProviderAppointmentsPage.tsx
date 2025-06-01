@@ -379,14 +379,14 @@ const ProviderAppointmentsPage: React.FC = () => {
                                 {appointment.patient?.name || 'Unknown Patient'}
                               </div>
                               <div className="text-sm text-gray-500">
-                                <span className="font-medium">{formatDate(appointmentDate, 'date')}</span> at <span className="font-medium">{formatTime(appointmentDate)}</span>
+                                <span className="font-medium">{formatDate(appointmentDate.toISOString())}</span> at <span className="font-medium">{formatTime(appointmentDate.toISOString())}</span>
                                 {isToday && <span className="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">Today</span>}
                               </div>
                             </div>
                           </div>
                           <div className="flex items-center">
                             <Badge
-                              variant={getStatusBadgeColor(appointment.status, appointment.notes)}
+                              //variant={getStatusBadgeColor(appointment.status, appointment.notes)}
                               className="mr-4"
                             >
                               {appointment.status === 'cancelled' && appointment.notes?.includes('did not show up')

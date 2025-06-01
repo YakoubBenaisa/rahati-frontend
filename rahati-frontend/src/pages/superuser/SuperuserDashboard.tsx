@@ -330,7 +330,7 @@ const SuperuserDashboard: React.FC = () => {
                     onChange={handleChange}
                     onBlur={handleBlur}
                     placeholder="Enter full name"
-                    error={touched.name && errors.name}
+                    //error={touched.name && errors.name}
                   />
                 </div>
 
@@ -346,7 +346,7 @@ const SuperuserDashboard: React.FC = () => {
                     onChange={handleChange}
                     onBlur={handleBlur}
                     placeholder="Enter email address"
-                    error={touched.email && errors.email}
+                    //error={touched.email && errors.email}
                   />
                 </div>
               </div>
@@ -364,7 +364,7 @@ const SuperuserDashboard: React.FC = () => {
                     onChange={handleChange}
                     onBlur={handleBlur}
                     placeholder="Enter password"
-                    error={touched.password && errors.password}
+                    //error={touched.password && errors.password}
                   />
                 </div>
 
@@ -380,7 +380,7 @@ const SuperuserDashboard: React.FC = () => {
                     onChange={handleChange}
                     onBlur={handleBlur}
                     placeholder="Confirm password"
-                    error={touched.password_confirmation && errors.password_confirmation}
+                    //error={touched.password_confirmation && errors.password_confirmation}
                   />
                 </div>
               </div>
@@ -410,7 +410,7 @@ const SuperuserDashboard: React.FC = () => {
                         } as unknown as React.ChangeEvent<HTMLSelectElement>);
                       }}
                       onBlur={handleBlur}
-                      error={touched.center_id && errors.center_id}
+                      //error={touched.center_id && errors.center_id}
                     >
                       <option value="">Select a center</option>
                       {centers.map(center => (
@@ -436,7 +436,7 @@ const SuperuserDashboard: React.FC = () => {
                     onChange={handleChange}
                     onBlur={handleBlur}
                     placeholder="Enter phone number"
-                    error={touched.phone && errors.phone}
+                    //error={touched.phone && errors.phone}
                   />
                 </div>
               </div>
@@ -452,7 +452,7 @@ const SuperuserDashboard: React.FC = () => {
                   onChange={handleChange}
                   onBlur={handleBlur}
                   placeholder="Enter address"
-                  error={touched.address && errors.address}
+                  //error={touched.address && errors.address}
                 />
               </div>
 

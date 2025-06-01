@@ -163,7 +163,9 @@ const AdminMealOptionsPage: React.FC = () => {
                           </div>
                         </Table.Cell>
                         <Table.Cell>
-                          <Badge variant={option.is_active ? 'success' : 'error'}>
+                          <Badge 
+                          //variant={option.is_active ? 'success' : 'error'}
+                          >
                             {option.is_active ? 'Active' : 'Inactive'}
                           </Badge>
                         </Table.Cell>

@@ -98,7 +98,7 @@ const AdminUserDetailsPage: React.FC = () => {
             setAppointments(appointmentsData.map((apt: any) => ({
               id: apt.id,
               date: apt.appointment_datetime ? apt.appointment_datetime.split('T')[0] : '',
-              time: apt.appointment_datetime ? formatDate(apt.appointment_datetime, 'time') : '',
+              time: apt.appointment_datetime ? formatDate(apt.appointment_datetime) : '',
               provider: apt.provider_name || 'Not assigned',
               center: getCenterName(apt.center_id),
               status: apt.status
@@ -273,7 +273,7 @@ const AdminUserDetailsPage: React.FC = () => {
               </Button>
               <Button
                 onClick={handleDeactivateUser}
-                variant={userDetails.is_active ? 'error' : 'primary'}
+                //variant={userDetails.is_active ? 'error' : 'primary'}
                 isLoading={isDeactivating}
               >
                 {userDetails.is_active ? 'Deactivate' : 'Activate'}
@@ -368,15 +368,15 @@ const AdminUserDetailsPage: React.FC = () => {
                       </div>
                       <div>
                         <span className="text-sm font-medium text-gray-500">Created At:</span>
-                        <p className="mt-1">{formatDate(userDetails.created_at, 'datetime')}</p>
+                        <p className="mt-1">{formatDate(userDetails.created_at)}</p>
                       </div>
                       <div>
                         <span className="text-sm font-medium text-gray-500">Last Updated:</span>
-                        <p className="mt-1">{formatDate(userDetails.updated_at, 'datetime')}</p>
+                        <p className="mt-1">{formatDate(userDetails.updated_at)}</p>
                       </div>
                       <div>
                         <span className="text-sm font-medium text-gray-500">Last Login:</span>
-                        <p className="mt-1">{userDetails.last_login ? formatDate(userDetails.last_login, 'datetime') : 'Never'}</p>
+                        <p className="mt-1">{userDetails.last_login ? formatDate(userDetails.last_login) : 'Never'}</p>
                       </div>
                     </div>
                   </div>

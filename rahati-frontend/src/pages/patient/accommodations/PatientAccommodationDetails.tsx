@@ -129,7 +129,7 @@ const PatientAccommodationDetails: React.FC = () => {
   };
 
   // Get status badge variant
-  const getStatusVariant = (status: string): string => {
+  /*const getStatusVariant = (status: string): string => {
     switch (status) {
       case 'confirmed':
         return 'success';
@@ -145,7 +145,7 @@ const PatientAccommodationDetails: React.FC = () => {
         return 'secondary';
     }
   };
-
+*/
   if (isLoading) {
     return (
       <MainLayout>
@@ -217,7 +217,7 @@ const PatientAccommodationDetails: React.FC = () => {
                 </p>
               </div>
               <Badge
-                variant={getStatusVariant(accommodation.status)}
+                //variant={getStatusVariant(accommodation.status)}
                 className="ml-4"
               >
                 {formatStatus(accommodation.status)}

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { MainLayout } from '../../../layouts';
 import { Card, Button, Input, Textarea, Alert } from '../../../components/ui';
-import { useAuth } from '../../../hooks';
+//import { useAuth } from '../../../hooks';
 import { useForm } from '../../../hooks';
 import { useCenterStore } from '../../../store/centerStore';
 import { isValidEmail, isValidPhone, isValidUrl } from '../../../utils/validationUtils';
@@ -22,7 +22,7 @@ interface EditCenterFormValues {
 
 const AdminEditCenterPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const { user } = useAuth('Admin');
+  //const { user } = useAuth('Admin');
   const navigate = useNavigate();
   const { selectedCenter, fetchCenterById, updateCenter, isLoading, error: storeError, clearError } = useCenterStore();
   const [error, setError] = useState<string | null>(null);
@@ -134,7 +134,7 @@ const AdminEditCenterPage: React.FC = () => {
   };
 
   // Initialize form with fetched values
-  const { values, errors, touched, handleChange, handleBlur, handleSubmit: submitForm, isSubmitting, setFieldValue, setMultipleFields } = useForm<EditCenterFormValues>(
+  const { values, handleChange, handleBlur, handleSubmit: submitForm, isSubmitting, setFieldValue, setMultipleFields } = useForm<EditCenterFormValues>(
     initialValues,
     handleSubmit,
     validateForm
@@ -264,7 +264,7 @@ const AdminEditCenterPage: React.FC = () => {
                     onChange={handleChange}
                     onBlur={handleBlur}
                     placeholder="Enter center name"
-                    error={touched.name && errors.name}
+                    //error={touched.name && errors.name}
                   />
                 </div>
 
@@ -280,7 +280,7 @@ const AdminEditCenterPage: React.FC = () => {
                     onBlur={handleBlur}
                     placeholder="Enter center description"
                     rows={4}
-                    error={touched.description && errors.description}
+                    //error={touched.description && errors.description}
                   />
                 </div>
 
@@ -295,7 +295,7 @@ const AdminEditCenterPage: React.FC = () => {
                     onChange={handleChange}
                     onBlur={handleBlur}
                     placeholder="Enter full address"
-                    error={touched.address && errors.address}
+                    //error={touched.address && errors.address}
                   />
                 </div>
 
@@ -311,7 +311,7 @@ const AdminEditCenterPage: React.FC = () => {
                       onChange={handleChange}
                       onBlur={handleBlur}
                       placeholder="Enter phone number"
-                      error={touched.phone && errors.phone}
+                      //error={touched.phone && errors.phone}
                     />
                   </div>
 
@@ -327,7 +327,7 @@ const AdminEditCenterPage: React.FC = () => {
                       onChange={handleChange}
                       onBlur={handleBlur}
                       placeholder="Enter email address"
-                      error={touched.email && errors.email}
+                      //error={touched.email && errors.email}
                     />
                   </div>
                 </div>
@@ -343,7 +343,7 @@ const AdminEditCenterPage: React.FC = () => {
                     onChange={handleChange}
                     onBlur={handleBlur}
                     placeholder="Enter website URL"
-                    error={touched.website && errors.website}
+                    //error={touched.website && errors.website}
                   />
                 </div>
 
@@ -359,7 +359,7 @@ const AdminEditCenterPage: React.FC = () => {
                       onChange={handleChange}
                       onBlur={handleBlur}
                       placeholder="Enter latitude"
-                      error={touched.latitude && errors.latitude}
+                      //error={touched.latitude && errors.latitude}
                     />
                   </div>
 
@@ -374,7 +374,7 @@ const AdminEditCenterPage: React.FC = () => {
                       onChange={handleChange}
                       onBlur={handleBlur}
                       placeholder="Enter longitude"
-                      error={touched.longitude && errors.longitude}
+                      //error={touched.longitude && errors.longitude}
                     />
                   </div>
                 </div>

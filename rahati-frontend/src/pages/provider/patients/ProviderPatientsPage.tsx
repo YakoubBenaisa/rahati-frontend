@@ -338,13 +338,13 @@ const ProviderPatientsPage: React.FC = () => {
                       <div>
                         <h4 className="text-sm font-medium text-gray-500">Last Visit</h4>
                         <p className="mt-1 text-sm text-gray-900">
-                          {patient.lastVisit ? formatDate(patient.lastVisit, 'date') : 'No previous visits'}
+                          {patient.lastVisit ? formatDate(patient.lastVisit) : 'No previous visits'}
                         </p>
                       </div>
                       <div>
                         <h4 className="text-sm font-medium text-gray-500">Upcoming Appointment</h4>
                         <p className="mt-1 text-sm text-gray-900">
-                          {patient.upcomingAppointment ? formatDate(patient.upcomingAppointment, 'datetime') : 'None scheduled'}
+                          {patient.upcomingAppointment ? formatDate(patient.upcomingAppointment) : 'None scheduled'}
                         </p>
                       </div>
                     </div>

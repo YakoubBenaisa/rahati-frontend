@@ -203,7 +203,9 @@ const AdminServiceCapacityDetailsPage: React.FC = () => {
                       {serviceCapacity.service_type}
                     </h2>
                     <div className="mt-2 flex items-center">
-                      <Badge variant={serviceCapacity.is_active ? 'success' : 'error'}>
+                      <Badge 
+                      //variant={serviceCapacity.is_active ? 'success' : 'error'}
+                      >
                         {serviceCapacity.is_active ? 'Active' : 'Inactive'}
                       </Badge>
                       <span className="ml-4 text-[var(--color-text-secondary)]">
@@ -213,7 +215,7 @@ const AdminServiceCapacityDetailsPage: React.FC = () => {
                   </div>
                   <div>
                     <Badge variant="info" size="lg">
-                      {formatDate(serviceCapacity.date, 'date')}
+                      {formatDate(serviceCapacity.date)}
                     </Badge>
                   </div>
                 </div>
@@ -248,13 +250,13 @@ const AdminServiceCapacityDetailsPage: React.FC = () => {
                       <div className="flex justify-between">
                         <span className="text-[var(--color-text-tertiary)]">Date:</span>
                         <span className="text-[var(--color-text-secondary)]">
-                          {formatDate(serviceCapacity.date, 'date')}
+                          {formatDate(serviceCapacity.date)}
                         </span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-[var(--color-text-tertiary)]">Time Range:</span>
                         <span className="text-[var(--color-text-secondary)]">
-                          {formatDate(serviceCapacity.start_time, 'time')} - {formatDate(serviceCapacity.end_time, 'time')}
+                          {formatDate(serviceCapacity.start_time)} - {formatDate(serviceCapacity.end_time)}
                         </span>
                       </div>
                       <div className="flex justify-between">
@@ -282,13 +284,13 @@ const AdminServiceCapacityDetailsPage: React.FC = () => {
                     <div>
                       <span className="text-[var(--color-text-tertiary)]">Created:</span>
                       <span className="ml-2 text-[var(--color-text-secondary)]">
-                        {serviceCapacity.created_at ? formatDate(serviceCapacity.created_at, 'datetime') : 'N/A'}
+                        {serviceCapacity.created_at ? formatDate(serviceCapacity.created_at) : 'N/A'}
                       </span>
                     </div>
                     <div>
                       <span className="text-[var(--color-text-tertiary)]">Last Updated:</span>
                       <span className="ml-2 text-[var(--color-text-secondary)]">
-                        {serviceCapacity.updated_at ? formatDate(serviceCapacity.updated_at, 'datetime') : 'N/A'}
+                        {serviceCapacity.updated_at ? formatDate(serviceCapacity.updated_at) : 'N/A'}
                       </span>
                     </div>
                   </div>

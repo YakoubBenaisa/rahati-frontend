@@ -211,7 +211,7 @@ const PatientDashboard: React.FC<PatientDashboardProps> = ({  }) => {
                     <Badge variant={getStatusBadgeVariant(appointment.status)}>
                       {appointment.status.charAt(0).toUpperCase() + appointment.status.slice(1)}
                     </Badge>
-                    <p className="text-sm text-gray-500">{formatDate(appointment.appointment_datetime, 'date')}</p>
+                    <p className="text-sm text-gray-500">{formatDate(appointment.appointment_datetime)}</p>
                   </div>
 
                   <h3 className="text-lg font-medium text-gray-900 mb-1">

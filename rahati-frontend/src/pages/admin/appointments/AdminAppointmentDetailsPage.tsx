@@ -257,7 +257,9 @@ const AdminAppointmentDetailsPage: React.FC = () => {
                     </p>
                   </div>
                   <div className="mt-2 md:mt-0">
-                    <Badge variant={getStatusBadgeVariant(appointment.status)}>
+                    <Badge 
+                    //variant={getStatusBadgeVariant(appointment.status)}
+                    >
                       {formatStatus(appointment.status)}
                     </Badge>
                   </div>

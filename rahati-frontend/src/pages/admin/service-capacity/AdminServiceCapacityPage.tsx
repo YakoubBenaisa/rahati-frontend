@@ -191,13 +191,15 @@ const AdminServiceCapacityPage: React.FC = () => {
                         <Table.Cell>{capacity.id}</Table.Cell>
                         <Table.Cell>{getCenterName(capacity.center_id)}</Table.Cell>
                         <Table.Cell>{capacity.service_type}</Table.Cell>
-                        <Table.Cell>{formatDate(capacity.date, 'date')}</Table.Cell>
+                        <Table.Cell>{formatDate(capacity.date)}</Table.Cell>
                         <Table.Cell>
-                          {formatDate(capacity.start_time, 'time')} - {formatDate(capacity.end_time, 'time')}
+                          {formatDate(capacity.start_time)} - {formatDate(capacity.end_time)}
                         </Table.Cell>
                         <Table.Cell>{capacity.max_capacity}</Table.Cell>
                         <Table.Cell>
-                          <Badge variant={capacity.is_active ? 'success' : 'error'}>
+                          <Badge 
+                          //variant={capacity.is_active ? 'success' : 'error'}
+                          >
                             {capacity.is_active ? 'Active' : 'Inactive'}
                           </Badge>
                         </Table.Cell>

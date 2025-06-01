@@ -5,7 +5,7 @@ import { MainLayout } from '../../../layouts';
 import { Button, Alert, Select, Textarea } from '../../../components/ui';
 import { useAuth } from '../../../hooks';
 import { useFeedbackStore, useAppointmentStore } from '../../../store';
-import { Appointment, RecommendationLikelihood } from '../../../types';
+import { RecommendationLikelihood } from '../../../types';
 
 interface FeedbackFormValues {
   appointment_id: number | null;
@@ -25,7 +25,6 @@ const PatientCreateFeedback: React.FC = () => {
   const { user } = useAuth('Patient');
   const { 
     submitFeedback, 
-    isLoading: feedbackLoading, 
     error: feedbackError 
   } = useFeedbackStore();
   
@@ -238,7 +237,7 @@ const PatientCreateFeedback: React.FC = () => {
                     value={formValues.appointment_id?.toString() || ''}
                     onChange={handleInputChange}
                     className="w-full"
-                    error={errors.appointment_id}
+                    //error={errors.appointment_id}
                     required
                   >
                     <option value="">-- Select an appointment --</option>

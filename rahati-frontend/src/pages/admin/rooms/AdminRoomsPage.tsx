@@ -155,7 +155,9 @@ const AdminRoomsPage: React.FC = () => {
                         <Table.Cell>${room.price_per_night}</Table.Cell>
                         <Table.Cell>{room.capacity} person(s)</Table.Cell>
                         <Table.Cell>
-                          <Badge variant={room.is_available ? 'success' : 'error'}>
+                          <Badge 
+                          //variant={room.is_available ? 'success' : 'error'}
+                          >
                             {room.is_available ? 'Available' : 'Unavailable'}
                           </Badge>
                         </Table.Cell>

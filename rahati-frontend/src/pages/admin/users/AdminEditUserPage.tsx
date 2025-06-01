@@ -278,7 +278,7 @@ const AdminEditUserPage: React.FC = () => {
                       onChange={handleChange}
                       onBlur={handleBlur}
                       placeholder="Enter full name"
-                      error={touched.name && errors.name}
+                      //error={touched.name && errors.name}
                     />
                   </div>
 
@@ -294,7 +294,7 @@ const AdminEditUserPage: React.FC = () => {
                       onChange={handleChange}
                       onBlur={handleBlur}
                       placeholder="Enter email address"
-                      error={touched.email && errors.email}
+                      //error={touched.email && errors.email}
                     />
                   </div>
                 </div>
@@ -310,7 +310,7 @@ const AdminEditUserPage: React.FC = () => {
                       value={values.role}
                       onChange={handleChange}
                       onBlur={handleBlur}
-                      error={touched.role && errors.role}
+                      //error={touched.role && errors.role}
                     >
                       {roleOptions.map(option => (
                         <option key={option.value} value={option.value}>
@@ -328,16 +328,16 @@ const AdminEditUserPage: React.FC = () => {
                       id="is_active"
                       name="is_active"
                       value={values.is_active.toString()}
-                      onChange={(e) => {
+                      /*onChange={(e) => {
                         handleChange({
                           target: {
                             name: 'is_active',
                             value: e.target.value === 'true'
                           }
                         } as React.ChangeEvent<HTMLSelectElement>);
-                      }}
+                      }}*/
                       onBlur={handleBlur}
-                      error={touched.is_active && errors.is_active}
+                      //error={touched.is_active && errors.is_active}
                     >
                       <option value="true">Active</option>
                       <option value="false">Inactive</option>
@@ -354,7 +354,7 @@ const AdminEditUserPage: React.FC = () => {
                       id="center_id"
                       name="center_id"
                       value={values.center_id?.toString() || ''}
-                      onChange={(e) => {
+                     /* onChange={(e) => {
                         const value = e.target.value ? parseInt(e.target.value) : undefined;
                         handleChange({
                           target: {
@@ -362,9 +362,9 @@ const AdminEditUserPage: React.FC = () => {
                             value
                           }
                         } as React.ChangeEvent<HTMLSelectElement>);
-                      }}
+                      }}*/
                       onBlur={handleBlur}
-                      error={touched.center_id && errors.center_id}
+                      //error={touched.center_id && errors.center_id}
                     >
                       <option value="">Select a center</option>
                       {centers.map(center => (
@@ -388,7 +388,7 @@ const AdminEditUserPage: React.FC = () => {
                       onChange={handleChange}
                       onBlur={handleBlur}
                       placeholder="Enter phone number"
-                      error={touched.phone && errors.phone}
+                      //error={touched.phone && errors.phone}
                     />
                   </div>
 
@@ -403,7 +403,7 @@ const AdminEditUserPage: React.FC = () => {
                       onChange={handleChange}
                       onBlur={handleBlur}
                       placeholder="Enter address"
-                      error={touched.address && errors.address}
+                      //error={touched.address && errors.address}
                     />
                   </div>
                 </div>
@@ -421,7 +421,7 @@ const AdminEditUserPage: React.FC = () => {
                         onChange={handleChange}
                         onBlur={handleBlur}
                         placeholder="Enter caregiver name"
-                        error={touched.caregiver_name && errors.caregiver_name}
+                        //error={touched.caregiver_name && errors.caregiver_name}
                       />
                     </div>
                     <div>
@@ -435,7 +435,7 @@ const AdminEditUserPage: React.FC = () => {
                         onChange={handleChange}
                         onBlur={handleBlur}
                         placeholder="Enter caregiver phone"
-                        error={touched.caregiver_phone && errors.caregiver_phone}
+                        //error={touched.caregiver_phone && errors.caregiver_phone}
                       />
                     </div>
                   </div>
@@ -453,7 +453,7 @@ const AdminEditUserPage: React.FC = () => {
                     onBlur={handleBlur}
                     placeholder="Enter any additional notes"
                     rows={4}
-                    error={touched.notes && errors.notes}
+                    //error={touched.notes && errors.notes}
                   />
                 </div>
 

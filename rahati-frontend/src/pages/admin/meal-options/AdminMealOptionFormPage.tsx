@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { MainLayout } from '../../../layouts';
 import { Card, Button, Input, Textarea, Alert, Switch, Spinner } from '../../../components/ui';
-import { useAuth } from '../../../hooks';
+//import { useAuth } from '../../../hooks';
 import { motion } from 'framer-motion';
 import { mealOptionsAPI } from '../../../services/api';
 import { MealOption } from '../../../types';
@@ -10,7 +10,7 @@ import { MealOption } from '../../../types';
 const AdminMealOptionFormPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const isEditMode = !!id;
-  const { user } = useAuth('Admin');
+  //const { user } = useAuth('Admin');
   const navigate = useNavigate();
   
   const [formData, setFormData] = useState<Partial<MealOption>>({

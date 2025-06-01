@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { MainLayout } from '../../../layouts';
 import { Card, Button, Input, Select, Textarea, Alert, Spinner } from '../../../components/ui';
-import { useAuth } from '../../../hooks';
+//import { useAuth } from '../../../hooks';
 import { motion } from 'framer-motion';
 import { appointmentsAPI, usersAPI, centersAPI } from '../../../services/api';
 import {  User, Center, AppointmentStatus } from '../../../types';
@@ -20,7 +20,7 @@ interface AppointmentFormValues {
 
 const AdminAppointmentFormPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const { user } = useAuth(['Admin', 'Superuser']);
+  //const { user } = useAuth(['Admin', 'Superuser']);
   const navigate = useNavigate();
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);

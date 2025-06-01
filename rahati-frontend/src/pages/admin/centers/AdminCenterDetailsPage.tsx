@@ -2,14 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import { MainLayout } from '../../../layouts';
 import { Card, Button, Badge, Alert, Tabs, Tab } from '../../../components/ui';
-import { useAuth } from '../../../hooks';
+//import { useAuth } from '../../../hooks';
 import { useCenterStore } from '../../../store/centerStore';
 import { motion } from 'framer-motion';
 
 const AdminCenterDetailsPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { user } = useAuth('Admin');
+ // const { user } = useAuth('Admin');
   const { selectedCenter, fetchCenterById, isLoading, error, clearError, deleteCenter } = useCenterStore();
   const [activeTab, setActiveTab] = useState('overview');
   const [localError, setLocalError] = useState<string | null>(null);
@@ -153,7 +153,7 @@ const AdminCenterDetailsPage: React.FC = () => {
               </Button>
               <Button
                 onClick={handleToggleStatus}
-                variant={selectedCenter.is_active ? 'danger' : 'success'}
+                //variant={selectedCenter.is_active ? 'danger' : 'success'}
                 isLoading={isDeactivating}
               >
                 {selectedCenter.is_active ? 'Deactivate' : 'Activate'}

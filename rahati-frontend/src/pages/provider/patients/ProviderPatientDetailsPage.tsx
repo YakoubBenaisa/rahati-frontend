@@ -475,7 +475,7 @@ const ProviderPatientDetailsPage: React.FC = () => {
                         <span className="text-sm font-medium text-gray-500">Date of Birth:</span>
                         <p className="mt-1">
                           {patient.dateOfBirth
-                            ? `${formatDate(patient.dateOfBirth, 'date')} (${calculateAge(patient.dateOfBirth)} years)`
+                            ? `${formatDate(patient.dateOfBirth)} (${calculateAge(patient.dateOfBirth)} years)`
                             : 'Not provided'}
                         </p>
                       </div>
@@ -586,7 +586,7 @@ const ProviderPatientDetailsPage: React.FC = () => {
                                   </div>
                                   <div className="ml-4">
                                     <div className="text-sm font-medium text-gray-900">
-                                      {formatDate(appointment.appointment_datetime, 'datetime')}
+                                      {formatDate(appointment.appointment_datetime)}
                                     </div>
                                     <div className="text-sm text-gray-500">
                                       {appointment.reason || 'No reason specified'}
@@ -676,7 +676,7 @@ const ProviderPatientDetailsPage: React.FC = () => {
                               <div className="flex justify-between items-start">
                                 <h4 className="text-lg font-medium text-gray-900">{note.title}</h4>
                                 <div className="text-sm text-gray-500">
-                                  {formatDate(note.date, 'date')}
+                                  {formatDate(note.date)}
                                 </div>
                               </div>
                               <p className="mt-2 text-gray-600 whitespace-pre-line">{note.content}</p>

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MainLayout } from '../../../layouts';
 import { Card, Button, Input, Textarea, Alert } from '../../../components/ui';
-import { useAuth } from '../../../hooks';
+//import { useAuth } from '../../../hooks';
 import { useForm } from '../../../hooks';
 import { useCenterStore } from '../../../store/centerStore';
 import { isValidEmail, isValidPhone, isValidUrl } from '../../../utils/validationUtils';
@@ -95,7 +95,7 @@ const AdminCreateCenterPage: React.FC = () => {
   };
 
   // Initialize form with default values
-  const { values, errors, touched, handleChange, handleBlur, handleSubmit: submitForm, isSubmitting, setFieldValue } = useForm<CreateCenterFormValues>(
+  const { values, handleChange, handleBlur, handleSubmit: submitForm, isSubmitting, setFieldValue } = useForm<CreateCenterFormValues>(
     {
       name: '',
       description: '',
@@ -187,7 +187,7 @@ const AdminCreateCenterPage: React.FC = () => {
                     onChange={handleChange}
                     onBlur={handleBlur}
                     placeholder="Enter center name"
-                    error={touched.name && errors.name}
+                    //error={touched.name && errors.name}
                   />
                 </div>
 
@@ -203,7 +203,7 @@ const AdminCreateCenterPage: React.FC = () => {
                     onBlur={handleBlur}
                     placeholder="Enter center description"
                     rows={4}
-                    error={touched.description && errors.description}
+                    //error={touched.description && errors.description}
                   />
                 </div>
 
@@ -218,7 +218,7 @@ const AdminCreateCenterPage: React.FC = () => {
                     onChange={handleChange}
                     onBlur={handleBlur}
                     placeholder="Enter full address"
-                    error={touched.address && errors.address}
+                    //error={touched.address && errors.address}
                   />
                 </div>
 
@@ -234,7 +234,7 @@ const AdminCreateCenterPage: React.FC = () => {
                       onChange={handleChange}
                       onBlur={handleBlur}
                       placeholder="Enter phone number"
-                      error={touched.phone && errors.phone}
+                      //error={touched.phone && errors.phone}
                     />
                   </div>
 
@@ -250,7 +250,7 @@ const AdminCreateCenterPage: React.FC = () => {
                       onChange={handleChange}
                       onBlur={handleBlur}
                       placeholder="Enter email address"
-                      error={touched.email && errors.email}
+                      //error={touched.email && errors.email}
                     />
                   </div>
                 </div>
@@ -266,7 +266,7 @@ const AdminCreateCenterPage: React.FC = () => {
                     onChange={handleChange}
                     onBlur={handleBlur}
                     placeholder="Enter website URL"
-                    error={touched.website && errors.website}
+                    //error={touched.website && errors.website}
                   />
                 </div>
 
@@ -282,7 +282,7 @@ const AdminCreateCenterPage: React.FC = () => {
                       onChange={handleChange}
                       onBlur={handleBlur}
                       placeholder="Enter latitude"
-                      error={touched.latitude && errors.latitude}
+                      //error={touched.latitude && errors.latitude}
                     />
                   </div>
 
@@ -297,7 +297,7 @@ const AdminCreateCenterPage: React.FC = () => {
                       onChange={handleChange}
                       onBlur={handleBlur}
                       placeholder="Enter longitude"
-                      error={touched.longitude && errors.longitude}
+                      //error={touched.longitude && errors.longitude}
                     />
                   </div>
                 </div>

@@ -219,11 +219,8 @@ const ProviderConsultationsPage: React.FC = () => {
                     <div className="flex items-center">
                       <div className="flex-shrink-0">
                         <div className={`h-12 w-12 rounded-full flex items-center justify-center text-lg font-semibold ${
-                          consultation.status === 'active'
-                            ? 'bg-blue-100 text-blue-600'
-                            : consultation.status === 'completed'
-                            ? 'bg-green-100 text-green-600'
-                            : 'bg-red-100 text-red-600'
+                           'bg-blue-100 text-blue-600'
+                           
                         }`}>
                           {consultation.patientName.charAt(0)}
                         </div>
@@ -249,9 +246,8 @@ const ProviderConsultationsPage: React.FC = () => {
                     <div className="mt-4 md:mt-0 flex flex-col items-end">
                       <Badge
                         variant={
-                          consultation.status === 'active' ? 'primary' :
-                          consultation.status === 'completed' ? 'success' :
-                          'danger'
+                           'primary' 
+                          
                         }
                         className="mb-2"
                       >

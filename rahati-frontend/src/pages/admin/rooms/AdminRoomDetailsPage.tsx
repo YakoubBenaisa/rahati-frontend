@@ -192,7 +192,9 @@ const AdminRoomDetailsPage: React.FC = () => {
                       Room {room.room_number}
                     </h2>
                     <div className="mt-2 flex items-center">
-                      <Badge variant={room.is_available ? 'success' : 'error'}>
+                      <Badge 
+                      //variant={room.is_available ? 'success' : 'error'}
+                      >
                         {room.is_available ? 'Available' : 'Unavailable'}
                       </Badge>
                       <span className="ml-4 text-[var(--color-text-secondary)]">
@@ -251,13 +253,13 @@ const AdminRoomDetailsPage: React.FC = () => {
                       <div className="flex justify-between">
                         <span className="text-[var(--color-text-tertiary)]">Created:</span>
                         <span className="text-[var(--color-text-secondary)]">
-                          {room.created_at ? formatDate(room.created_at, 'datetime') : 'N/A'}
+                          {room.created_at ? formatDate(room.created_at) : 'N/A'}
                         </span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-[var(--color-text-tertiary)]">Last Updated:</span>
                         <span className="text-[var(--color-text-secondary)]">
-                          {room.updated_at ? formatDate(room.updated_at, 'datetime') : 'N/A'}
+                          {room.updated_at ? formatDate(room.updated_at) : 'N/A'}
                         </span>
                       </div>
                     </div>

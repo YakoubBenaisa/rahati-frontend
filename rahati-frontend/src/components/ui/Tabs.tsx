@@ -24,7 +24,7 @@ const Tabs: React.FC<TabsProps> = ({ children, activeTab, onChange, className = 
   ) as React.ReactElement[];
 
   // Get active tab content
-  const activeTabContent = tabs.find((tab) => (tab.props as TabProps).id === activeTab)?.props.children;
+  //const activeTabContent = tabs.find((tab) => (tab.props as TabProps).id === activeTab)?.props.children;
 
   return (
     <div className={className}>
@@ -53,7 +53,7 @@ const Tabs: React.FC<TabsProps> = ({ children, activeTab, onChange, className = 
           })}
         </nav>
       </div>
-      <div className="py-6">{activeTabContent}</div>
+     {/* <div className="py-6">{activeTabContent}</div>*/}
     </div>
   );
 };
