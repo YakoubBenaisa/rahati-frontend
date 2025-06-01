@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import { MainLayout } from '../../../layouts';
 import { Card, Button, Badge, Alert, Tabs, Tab } from '../../../components/ui';
-import { useAuth } from '../../../hooks';
+//import { useAuth } from '../../../hooks';
 import { motion } from 'framer-motion';
 import { usersAPI, centersAPI, appointmentsAPI } from '../../../services/api';
 import { formatDate } from '../../../utils/dateUtils';
@@ -35,7 +35,7 @@ interface ActivityLog {
 const AdminUserDetailsPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { user } = useAuth('Admin');
+  //const { user } = useAuth('Admin');
   const [isLoading, setIsLoading] = useState(true);
   const [userDetails, setUserDetails] = useState<UserDetails | null>(null);
   const [appointments, setAppointments] = useState<Appointment[]>([]);

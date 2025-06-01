@@ -104,7 +104,7 @@ const ProviderAppointmentsPage: React.FC = () => {
   };
 
   // Get status badge color
-  const getStatusBadgeColor = (status: AppointmentStatus, notes?: string) => {
+  /*const getStatusBadgeColor = (status: AppointmentStatus, notes?: string) => {
     // Check if this is a no-show (cancelled with specific note)
     if (status === 'cancelled' && notes && notes.includes('did not show up')) {
       return 'warning';
@@ -122,7 +122,7 @@ const ProviderAppointmentsPage: React.FC = () => {
       default:
         return 'default';
     }
-  };
+  };*/
 
   // Handle appointment cancellation
   const handleCancelAppointment = async (id: number) => {
@@ -361,7 +361,7 @@ const ProviderAppointmentsPage: React.FC = () => {
               <ul className="divide-y divide-gray-200">
                 {filteredAppointments.map((appointment) => {
                   const appointmentDate = new Date(appointment.appointment_datetime);
-                  const isUpcoming = appointmentDate > new Date();
+                  //const isUpcoming = appointmentDate > new Date();
                   const isToday = new Date().toDateString() === appointmentDate.toDateString();
 
                   return (
@@ -398,7 +398,7 @@ const ProviderAppointmentsPage: React.FC = () => {
                                 <>
                                   <Button
                                     size="sm"
-                                    variant="success"
+                                   // variant="success"
                                     onClick={() => handleStartConsultation(appointment.id, appointment.patient_id)}
                                   >
                                     Start Consultation
@@ -412,7 +412,7 @@ const ProviderAppointmentsPage: React.FC = () => {
                                   </Button>
                                   <Button
                                     size="sm"
-                                    variant="warning"
+                                   // variant="warning"
                                     onClick={() => handleNoShowAppointment(appointment.id)}
                                   >
                                     No Show

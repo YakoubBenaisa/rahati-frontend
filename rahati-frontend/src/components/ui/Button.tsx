@@ -4,7 +4,6 @@ import { Link, LinkProps } from 'react-router-dom';
 export type ButtonVariant = 'primary' | 'secondary' | 'accent' | 'outline' | 'ghost' | 'link' | 'danger';
 export type ButtonSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 
-// Base button props
 interface ButtonBaseProps {
   variant?: ButtonVariant;
   size?: ButtonSize;
@@ -28,7 +27,7 @@ interface LinkButtonProps extends ButtonBaseProps, Omit<LinkProps, 'className'> 
   as: typeof Link;
 }
 
-// Combined props type
+// Combined props
 type CombinedButtonProps = ButtonProps | LinkButtonProps;
 
 const Button = forwardRef<HTMLButtonElement | HTMLAnchorElement, CombinedButtonProps>((props, ref) => {
@@ -46,10 +45,7 @@ const Button = forwardRef<HTMLButtonElement | HTMLAnchorElement, CombinedButtonP
     ...rest
   } = props;
 
-  // Base classes
   const baseClasses = 'inline-flex items-center justify-center font-medium rounded-md focus:outline-none transition-all duration-200';
-
-  // Size classes
   const sizeClasses = {
     xs: 'px-2 py-1 text-xs',
     sm: 'px-3 py-1.5 text-sm',
@@ -58,7 +54,6 @@ const Button = forwardRef<HTMLButtonElement | HTMLAnchorElement, CombinedButtonP
     xl: 'px-6 py-3 text-xl',
   };
 
-  // Variant classes
   const variantClasses = {
     primary: 'bg-[var(--color-primary-600)] text-white hover:bg-[var(--color-primary-700)] focus:ring-2 focus:ring-[var(--color-primary-500)] focus:ring-offset-2',
     secondary: 'bg-[var(--color-secondary-600)] text-white hover:bg-[var(--color-secondary-700)] focus:ring-2 focus:ring-[var(--color-secondary-500)] focus:ring-offset-2',
@@ -69,13 +64,9 @@ const Button = forwardRef<HTMLButtonElement | HTMLAnchorElement, CombinedButtonP
     danger: 'bg-[var(--color-error)] text-white hover:opacity-90 focus:ring-2 focus:ring-[var(--color-error)] focus:ring-offset-2',
   };
 
-  // Disabled classes
   const disabledClasses = 'opacity-50 cursor-not-allowed';
-
-  // Full width class
   const fullWidthClass = fullWidth ? 'w-full' : '';
 
-  // Combine all classes
   const buttonClasses = `
     ${baseClasses}
     ${sizeClasses[size]}
@@ -85,7 +76,6 @@ const Button = forwardRef<HTMLButtonElement | HTMLAnchorElement, CombinedButtonP
     ${className}
   `.trim().replace(/\s+/g, ' ');
 
-  // Button content
   const content = (
     <>
       {isLoading && (
@@ -100,9 +90,6 @@ const Button = forwardRef<HTMLButtonElement | HTMLAnchorElement, CombinedButtonP
     </>
   );
 
-  // Animation props
-
-  // Render as Link
   if (Component === Link) {
     return (
       <Component
@@ -115,16 +102,15 @@ const Button = forwardRef<HTMLButtonElement | HTMLAnchorElement, CombinedButtonP
     );
   }
 
-  // Render as button
   return (
-    <Component
+    <button
       className={buttonClasses}
       disabled={disabled || isLoading}
-      ref={Component === Link ? (ref as React.Ref<HTMLAnchorElement | null>) : (ref as React.Ref<HTMLButtonElement | null>)}
-      {...rest}
+      ref={ref as React.Ref<HTMLButtonElement>}
+      {...rest as ButtonHTMLAttributes<HTMLButtonElement>}
     >
       {content}
-    </Component>
+    </button>
   );
 });
 

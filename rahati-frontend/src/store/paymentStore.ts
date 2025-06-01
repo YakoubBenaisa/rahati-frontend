@@ -16,7 +16,7 @@ interface PaymentState {
   clearError: () => void;
 }
 
-export const usePaymentStore = create<PaymentState>((set, get) => ({
+export const usePaymentStore = create<PaymentState>((set) => ({
   payments: [],
   selectedPayment: null,
   isLoading: false,

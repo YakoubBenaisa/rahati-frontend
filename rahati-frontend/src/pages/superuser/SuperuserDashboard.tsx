@@ -22,7 +22,7 @@ interface CreateAdminFormValues {
 
 const SuperuserDashboard: React.FC = () => {
   const { user } = useAuth('Superuser');
-  const { adminStats, fetchAdminStats, isLoading: statsLoading, error: statsError } = useDashboardStore();
+  const { adminStats, fetchAdminStats, error: statsError } = useDashboardStore();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
@@ -149,7 +149,7 @@ const SuperuserDashboard: React.FC = () => {
   };
 
   // Initialize form with default values
-  const { values, errors, touched, handleChange, handleBlur, handleSubmit: submitForm } = useForm<CreateAdminFormValues>(
+  const { values, handleChange, handleBlur, handleSubmit: submitForm } = useForm<CreateAdminFormValues>(
     {
       name: '',
       email: '',

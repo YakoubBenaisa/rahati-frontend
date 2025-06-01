@@ -15,8 +15,8 @@ interface ProviderDashboardProps {
 
 const ProviderDashboard: React.FC<ProviderDashboardProps> = () => {
   const { user } = useAuth('Provider');
-  const { appointments, fetchAppointments, isLoading: appointmentsLoading, error: appointmentsError } = useAppointmentStore();
-  const { providerStats, fetchProviderStats, isLoading: statsLoading, error: statsError } = useDashboardStore();
+  const { appointments, fetchAppointments, error: appointmentsError } = useAppointmentStore();
+  const { providerStats, fetchProviderStats, error: statsError } = useDashboardStore();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [todayAppointments, setTodayAppointments] = useState<Appointment[]>([]);

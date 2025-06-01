@@ -48,7 +48,7 @@ const AdminAppointmentsPage: React.FC = () => {
           setTotalItems(data.meta.total);
         }
       } catch (err) {
-        console.error('Error fetching appointments:', err);
+        console.error('Error fetching appointments:'+totalItems, err);
         setError('Failed to load appointments. Please try again.');
       } finally {
         setIsLoading(false);

@@ -17,7 +17,7 @@ const AdminServiceCapacityPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
-  const [totalItems, setTotalItems] = useState<number>(0);
+  const [, setTotalItems] = useState<number>(0);
   const itemsPerPage = 10;
 
   // Fetch centers for reference

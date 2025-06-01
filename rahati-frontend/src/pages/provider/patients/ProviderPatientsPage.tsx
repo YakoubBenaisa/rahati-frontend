@@ -23,7 +23,7 @@ const ProviderPatientsPage: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filteredPatients, setFilteredPatients] = useState<Patient[]>([]);
   const [error, setError] = useState<string | null>(null);
-  const [patientAppointments, setPatientAppointments] = useState<Record<number, string>>({});
+  const [, setPatientAppointments] = useState<Record<number, string>>({});
 
   // Fetch patients data from API
   useEffect(() => {
@@ -95,7 +95,7 @@ const ProviderPatientsPage: React.FC = () => {
           setFilteredPatients(fallbackPatients);
 
           // Fetch appointments for each patient
-          fetchPatientAppointments(fallbackPatients);
+          fetchPatientAppointments();
 
           setError('Using limited patient data. Some appointment information may be missing.');
         } catch (fallbackErr) {
@@ -111,7 +111,7 @@ const ProviderPatientsPage: React.FC = () => {
   }, []);
 
   // Fetch appointments for patients
-  const fetchPatientAppointments = async (patientsList: Patient[]) => {
+  const fetchPatientAppointments = async () => {
     try {
       // Get all appointments
       const response = await appointmentsAPI.getAppointments();

@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import { MainLayout } from '../../../layouts';
-import { Card, Button, Badge, Textarea, Alert, Input, Select } from '../../../components/ui';
-import { useAuth } from '../../../hooks';
+import { Card, Button, Badge, Textarea, Alert, Input } from '../../../components/ui';
+//import { useAuth } from '../../../hooks';
 import { motion } from 'framer-motion';
 
 interface ConsultationDetails {
@@ -29,7 +29,7 @@ interface ConsultationDetails {
 const ProviderConsultationDetailsPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { user } = useAuth('Provider');
+  //const { user } = useAuth('Provider');
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [consultation, setConsultation] = useState<ConsultationDetails | null>(null);
@@ -249,7 +249,7 @@ const ProviderConsultationDetailsPage: React.FC = () => {
                 <>
                   <Button
                     onClick={handleCompleteConsultation}
-                    variant="success"
+                    //variant={"success"}
                     isLoading={isSaving}
                   >
                     Complete

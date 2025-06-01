@@ -107,7 +107,7 @@ const AdminEditCenterPage: React.FC = () => {
   };
 
   // Handle form submission
-  const handleSubmit = async (values: EditCenterFormValues, resetForm: () => void) => {
+  const handleSubmit = async (values: EditCenterFormValues) => {
     if (!id) return;
 
     setError(null);

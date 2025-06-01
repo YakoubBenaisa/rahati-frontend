@@ -12,8 +12,8 @@ interface PasswordFormValues {
 }
 
 const PatientSettings: React.FC = () => {
-  const { user, logout } = useAuth('Patient');
-  const { updatePassword, updateUserProfile, isLoading, error: userError } = useUserStore();
+  const {  logout } = useAuth('Patient');
+  const { updatePassword, error: userError } = useUserStore();
 
   const [passwordFormValues, setPasswordFormValues] = useState<PasswordFormValues>({
     current_password: '',
@@ -121,13 +121,13 @@ const PatientSettings: React.FC = () => {
 
     try {
       // Create settings object
-      const notificationSettings = {
+      /*const notificationSettings = {
         email_notifications: emailNotifications,
         sms_notifications: smsNotifications,
         appointment_reminders: appointmentReminders,
         feedback_requests: feedbackRequests,
         marketing_emails: marketingEmails
-      };
+      };*/
 
       // Update user profile with notification settings
 
@@ -152,10 +152,10 @@ const PatientSettings: React.FC = () => {
 
     try {
       // Create settings object
-      const privacySettings = {
+     /* const privacySettings = {
         share_data_with_providers: shareDataWithProviders,
         share_anonymous_data: shareAnonymousData
-      };
+      };*/
 
       // Update user profile with privacy settings
 

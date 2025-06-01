@@ -24,7 +24,7 @@ const ContactPage: React.FC = () => {
     }
     
     if (!values.email) {
-      errors.email = 'Email is required';
+      errors.email = `Email is required ${isSubmitted}`;
     } else if (!/\S+@\S+\.\S+/.test(values.email)) {
       errors.email = 'Email is invalid';
     }
@@ -86,7 +86,7 @@ const ContactPage: React.FC = () => {
           
           {showAlert && (
             <Alert 
-              type="success" 
+              //type="success" 
               title="Message Sent!" 
               message="Thank you for contacting us. We'll get back to you as soon as possible."
               onClose={() => setShowAlert(false)}

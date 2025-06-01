@@ -7,7 +7,7 @@ import { useForm } from '../../../hooks';
 import { isValidEmail, isValidPhone } from '../../../utils/validationUtils';
 import { motion } from 'framer-motion';
 import { usersAPI, centersAPI } from '../../../services/api';
-import { User, Center, UserRole } from '../../../types';
+import { Center, UserRole } from '../../../types';
 
 interface EditUserFormValues {
   name: string;
@@ -130,7 +130,7 @@ const AdminEditUserPage: React.FC = () => {
   };
 
   // Handle form submission
-  const handleSubmit = async (values: EditUserFormValues, resetForm: () => void) => {
+  const handleSubmit = async (values: EditUserFormValues) => {
     setError(null);
     setIsSaving(true);
 
@@ -169,7 +169,7 @@ const AdminEditUserPage: React.FC = () => {
   };
 
   // Initialize form with fetched values
-  const { values, errors, touched, handleChange, handleBlur, handleSubmit: submitForm, isSubmitting, setMultipleFields } = useForm<EditUserFormValues>(
+  const { values,  handleChange, handleBlur, handleSubmit: submitForm, setMultipleFields } = useForm<EditUserFormValues>(
     initialValues,
     handleSubmit,
     validateForm
@@ -191,10 +191,10 @@ const AdminEditUserPage: React.FC = () => {
   ];
 
   // Status options
-  const statusOptions = [
+  /*const statusOptions = [
     { value: true, label: 'Active' },
     { value: false, label: 'Inactive' }
-  ];
+  ];*/
 
   if (isLoading) {
     return (

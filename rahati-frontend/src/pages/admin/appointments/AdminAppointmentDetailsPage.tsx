@@ -108,7 +108,7 @@ const AdminAppointmentDetailsPage: React.FC = () => {
   };
 
   // Get status badge variant
-  const getStatusBadgeVariant = (status: AppointmentStatus) => {
+  /*const getStatusBadgeVariant = (status: AppointmentStatus) => {
     switch (status) {
       case 'scheduled':
         return 'primary';
@@ -122,7 +122,7 @@ const AdminAppointmentDetailsPage: React.FC = () => {
         return 'secondary';
     }
   };
-
+*/
   // Format status text
   const formatStatus = (status: AppointmentStatus) => {
     return status.charAt(0).toUpperCase() + status.slice(1);

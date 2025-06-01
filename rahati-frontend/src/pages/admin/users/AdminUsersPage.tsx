@@ -17,7 +17,6 @@ const AdminUsersPage: React.FC = () => {
   const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [roleFilter, setRoleFilter] = useState('all');
-  const [statusFilter, setStatusFilter] = useState('all');
   const [error, setError] = useState<string | null>(null);
   const [centers, setCenters] = useState<Center[]>([]);
   const [currentPage, setCurrentPage] = useState<number>(1);

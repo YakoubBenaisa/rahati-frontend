@@ -38,7 +38,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = () => {
 
         setIsLoading(false);
       } catch (err: any) {
-        setError(err.message || 'Failed to load dashboard data');
+        setError(err.message || 'Failed to load dashboard data'+statsLoading);
         setIsLoading(false);
       }
     };

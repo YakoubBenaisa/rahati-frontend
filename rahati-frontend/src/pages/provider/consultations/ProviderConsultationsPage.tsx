@@ -23,7 +23,7 @@ interface ConsultationUI {
 const ProviderConsultationsPage: React.FC = () => {
   const { user } = useAuth('Provider');
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [, setError] = useState<string | null>(null);
   const [consultations, setConsultations] = useState<ConsultationUI[]>([]);
   const [filteredConsultations, setFilteredConsultations] = useState<ConsultationUI[]>([]);
   const [searchTerm, setSearchTerm] = useState('');

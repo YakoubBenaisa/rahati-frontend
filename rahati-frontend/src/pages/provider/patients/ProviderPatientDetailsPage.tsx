@@ -297,14 +297,14 @@ const ProviderPatientDetailsPage: React.FC = () => {
     try {
       // In a real application, you would have an API endpoint for adding medical notes
       // For now, we'll use consultations as a proxy for medical notes
-      const consultationData = {
+      /*const consultationData = {
         patient_id: Number(id),
         provider_id: user.id,
         diagnosis: noteTitle,
         notes: newNote,
         consultation_date: new Date().toISOString(),
         status: 'completed'
-      };
+      };*/
 
       
 

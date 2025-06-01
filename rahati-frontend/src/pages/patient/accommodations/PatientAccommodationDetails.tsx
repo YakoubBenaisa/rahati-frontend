@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import { MainLayout } from '../../../layouts';
 import { Card, Button, Badge } from '../../../components/ui';
-import { useAuth } from '../../../hooks';
+//import { useAuth } from '../../../hooks';
 import { motion } from 'framer-motion';
 
 interface AccommodationDetails {
@@ -47,7 +47,7 @@ interface AccommodationDetails {
 const PatientAccommodationDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { user } = useAuth('Patient');
+  //const { user } = useAuth('Patient');
   const [isLoading, setIsLoading] = useState(true);
   const [accommodation, setAccommodation] = useState<AccommodationDetails | null>(null);
   const [isCancelling, setIsCancelling] = useState(false);
